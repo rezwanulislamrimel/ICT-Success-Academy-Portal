@@ -27,7 +27,7 @@ a{color:inherit}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
 
-/* header */
+/* header
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:"Sora",sans-serif;font-weight:700;font-size:17px}
@@ -38,7 +38,492 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:co
 nav{display:flex;gap:4px;align-items:center;overflow-x:auto}
 nav a{text-decoration:none;padding:8px 12px;border-radius:8px;font-size:15px;color:var(--muted);white-space:nowrap}
 nav a:hover{color:var(--ink);background:var(--surface)}
-#theme{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;flex:none}
+#theme{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;flex:none} */
+/* আপনার পুরনো হেডার স্টাইল */
+header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+}
+.logo img {
+  height: 40px;
+  width: auto;
+  border-radius: 8px;
+  background: #fff;
+  padding: 2px;
+  display: block;
+}
+nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+nav a {
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+nav a:hover, nav a.active {
+  color: var(--ink);
+  background: var(--surface);
+}
+#theme {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 16px;
+  flex: none;
+}
+
+/* মোবাইল টগল বাটন (ডেস্কটপে হাইড থাকবে) */
+.mobile-toggle-btn {
+  display: none;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+/* মোবাইল রেসপন্সিভ ও অ্যানিমেশন ডিজাইন */
+@media screen and (max-width: 768px) {
+  .mobile-toggle-btn {
+    display: flex;
+  }
+  
+  nav {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 20px;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    display: none; /* ডিফল্টভাবে মোবাইল মেনু লুকানো থাকবে */
+    animation: fadeInSlide 0.25s ease-in-out;
+  }
+
+  nav.nav-open {
+    display: flex; /* টগল করলে শো করবে */
+  }
+
+  nav a {
+    width: 100%;
+    padding: 10px 14px;
+  }
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+
+
+/* --- WORLD CLASS HEADER STYLES & ANIMATIONS --- */
+
+.world-class-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 1000;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scroll korle header e floating & glow effect asbe */
+.world-class-header.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid color-mix(in srgb, var(--brand) 30%, var(--line));
+  transform: translateY(0px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 72px; /* ektu beshi space modern look er jonno */
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Logo Animation & Styling */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.02);
+}
+
+.logo-icon-wrapper {
+  position: relative;
+  border-radius: 12px;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--brand), transparent);
+}
+
+.logo img {
+  height: 42px;
+  width: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #fff;
+  display: block;
+}
+
+.logo-text {
+  background: linear-gradient(135deg, var(--ink), var(--muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Navigation Links */
+nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+nav a {
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+nav a:hover {
+  color: var(--ink);
+  background: var(--surface);
+  transform: translateY(-2px);
+}
+
+nav a.active {
+  color: var(--brand-ink, #fff);
+  background: var(--brand);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+/* Special Admission Pill Button Animation */
+.admission-pill {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+  transition: all 0.3s ease !important;
+}
+
+.admission-pill:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5) !important;
+}
+
+/* AI Helper Link Styling */
+.ai-link {
+  border: 1px dashed color-mix(in srgb, var(--brand) 50%, var(--line));
+}
+
+/* Theme Toggle Button */
+#theme {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 16px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#theme:hover {
+  background: var(--brand);
+  color: #fff;
+  transform: rotate(15deg) scale(1.05);
+}
+
+/* Animated Mobile Hamburger Toggle Button (3 lines morphing to X) */
+.mobile-toggle-btn {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.2s;
+}
+
+.mobile-toggle-btn span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hamburger to 'X' animation */
+.mobile-toggle-btn.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.mobile-toggle-btn.open span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+.mobile-toggle-btn.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- MOBILE RESPONSIVE DRAWER & ANIMATIONS --- */
+@media screen and (max-width: 768px) {
+  .mobile-toggle-btn {
+    display: flex;
+  }
+  
+  nav {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 72px);
+    background: color-mix(in srgb, var(--bg) 98%, transparent);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    
+    /* Smooth Slide Down & Fade Animation */
+    opacity: 0;
+    transform: translateY(-15px);
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  nav.nav-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  nav a {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 17px;
+    border-radius: 14px;
+    text-align: center;
+    background: var(--surface);
+  }
+
+  .admission-pill {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  #theme {
+    width: 100%;
+    height: 45px;
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+}
+
+
+
+/* --- Ultra-Premium Electric Violet / Indigo Active Theme --- */
+nav a.active, 
+nav a[aria-current="page"] {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.35) !important;
+  transform: scale(1.02);
+  animation: premiumPulse 2.5s infinite ease-in-out;
+}
+
+/* Smooth & Soft Pulsing Glow Keyframes */
+@keyframes premiumPulse {
+  0% {
+    box-shadow: 0 0 18px rgba(99, 102, 241, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(139, 92, 246, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 18px rgba(99, 102, 241, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Hover effect */
+nav a:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+
+
+/* --- Dashboard & Login Styling Additions --- */
+
+.dashboard-link {
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.ph-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Login Button */
+.ph-login-btn {
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ph-login-btn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive adjustments for actions */
+@media screen and (max-width: 768px) {
+  .ph-nav-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .ph-login-btn {
+    text-align: center;
+    width: 100%;
+    padding: 12px;
+  }
+}
+/* --- Active / Selected Menu Smooth Animation & Glow --- */
+nav a.active, 
+nav a[aria-current="page"] {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.02);
+  animation: activePulse 2s infinite ease-in-out;
+}
+
+/* Smooth Pulsing Glow Keyframes */
+@keyframes activePulse {
+  0% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Hover effect on mobile menu items for extra smoothness */
+nav a:hover {
+  transform: translateX(4px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
 
 /* hero */
 .hero{padding:48px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
