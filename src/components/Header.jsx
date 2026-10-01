@@ -13,7 +13,8 @@ export default function Header() {
         <Link className="logo" to="/"><img src="/logo.webp" alt="ICT Success Academy logo" /> <span>ICT Success Academy</span></Link>
         <nav aria-label="প্রধান মেনু">
           <NavLink to="/courses">কোর্স</NavLink>
-          <NavLink to="/practice" className="hide-sm">প্র্যাকটিস</NavLink>
+          <NavLink to="/lab">ল্যাব</NavLink>
+          <NavLink to="/practice">🎮 ফ্রি MCQ</NavLink>
           <a href="#" onClick={openAI}>AI সহায়ক</a>
           <NavLink to="/about" className="hide-sm">কেন আমরা</NavLink>
           <NavLink to="/admission">ভর্তি</NavLink>

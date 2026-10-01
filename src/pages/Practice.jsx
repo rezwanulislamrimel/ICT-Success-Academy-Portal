@@ -1,46 +1,40 @@
 import { useState } from 'react';
-import { QUIZ } from '../data.js';
+import { LEVELS } from '../data.js';
+import { TOPICS, getQs, loadExtra } from '../mcq/bank.js';
+import { genQs, hasGen } from '../mcq/gen.js';
+import Game from '../mcq/Game.jsx';
+import '../mcq/mcq.css';
+
+const best = (k) => { try { return +localStorage.getItem('mcq:' + k) || 0; } catch (e) { return 0; } };
+const sample = (a, n) => [...a].sort(() => Math.random() - 0.5).slice(0, n);
+async function pool(topic, n) { return sample([...getQs(topic), ...(await loadExtra(topic)), ...genQs(topic, 60)], n); }
 
 export default function Practice() {
-  const [qi, setQi] = useState(0);
-  const [picked, setPicked] = useState(null);
-  const [right, setRight] = useState(0);
-  const [done, setDone] = useState(0);
-  const Q = QUIZ[qi];
-
-  const pick = (i) => {
-    if (picked !== null) return;
-    setPicked(i); setDone(done + 1);
-    if (i === Q.a) setRight(right + 1);
+  const [level, setLevel] = useState('HSC');
+  const [play, setPlay] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const L = LEVELS[level], tp = TOPICS[level];
+  const start = async (title, key, topics, per) => {
+    setBusy(true);
+    const qs = (await Promise.all(topics.map((t) => pool(t, per)))).flat();
+    setBusy(false); setPlay({ title, key, topics, per, qs, id: Date.now() });
   };
-  const askAI = () => window.dispatchEvent(new CustomEvent('ask-ai', {
-    detail: { text: 'এই MCQ টা সহজ করে বুঝিয়ে দাও: ' + Q.q + ' (সঠিক উত্তর: ' + Q.o[Q.a] + ')' } }));
-
+  const again = async () => { const qs = (await Promise.all(play.topics.map((t) => pool(t, play.per)))).flat(); setPlay({ ...play, qs, id: Date.now() }); };
+  if (play) return <div className="wrap"><Game key={play.id} title={play.title} storeKey={play.key} qs={play.qs} onAgain={again} onExit={() => setPlay(null)} /></div>;
+  const info = (t) => (hasGen(t) ? '♾️ প্রতিবার নতুন প্রশ্ন' : `${getQs(t).length}টি প্রশ্ন`);
   return (
-    <div className="wrap">
-      <section>
-        <div className="quiz">
-          <div className="sec-head" style={{ margin: 0 }}>
-            <h2>দ্রুত প্র্যাকটিস</h2>
-            <p>প্রতিদিন কয়েকটি MCQ করলে ভুলগুলো আগেই ধরা পড়ে। উত্তর বেছে নিলেই ব্যাখ্যা দেখা যাবে।</p>
-          </div>
-          <div className="qcard">
-            <div className="q">{Q.q}</div>
-            <div>
-              {Q.o.map((t, i) => (
-                <button key={i} className={'opt' + (picked !== null && i === Q.a ? ' ok' : '') + (picked === i && i !== Q.a ? ' bad' : '')}
-                  disabled={picked !== null} onClick={() => pick(i)}>{t}</button>
-              ))}
-            </div>
-            <div aria-live="polite">{picked !== null && (picked === Q.a ? 'সঠিক। ' : 'ভুল। ') + Q.w}</div>
-            {picked !== null && <button className="askai" onClick={askAI}>AI-কে ব্যাখ্যা করতে বলো</button>}
-            <div className="qfoot">
-              <span>{done ? `সঠিক ${right} / ${done}` : `প্রশ্ন ${qi + 1} / ${QUIZ.length}`}</span>
-              <button onClick={() => { setQi((qi + 1) % QUIZ.length); setPicked(null); }}>পরের প্রশ্ন</button>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="wrap mq-hub" style={{ paddingTop: 26 }}>
+      <h1>🎮 ফ্রি MCQ গেম</h1>
+      <p className="sub">৩টি জীবন, ২০ সেকেন্ড সময়, স্ট্রিক বোনাস আর 50-50 লাইফলাইন। চ্যাপ্টার বেছে খেলা শুরু করো — একদম ফ্রি!</p>
+      <div className="tabs" role="tablist">{Object.keys(LEVELS).map((k) => <button key={k} className="tab" role="tab" aria-selected={k === level} onClick={() => setLevel(k)}>{k}</button>)}</div>
+      {busy && <p className="sub">প্রশ্ন সাজানো হচ্ছে…</p>}
+      <div className="mq-grid">
+        <button className="mq-card mix" onClick={() => start(level + ' — মিক্স চ্যালেঞ্জ', level + ':mix', tp, 8)}>
+          <b className="n">🎲</b><span>মিক্স চ্যালেঞ্জ (সব চ্যাপ্টার)</span><small>প্রতি চ্যাপ্টার থেকে ৮টি · সর্বোচ্চ স্কোর {best(level + ':mix')}</small></button>
+        {L.chapters.map((c, i) => (
+          <button key={c[0]} className="mq-card" onClick={() => start(c[0], level + ':' + i, [tp[i]], 20)}>
+            <b className="n">{i + 1}</b><span>{c[0]}</span><small>{info(tp[i])} · সর্বোচ্চ স্কোর {best(level + ':' + i)}</small></button>))}
+      </div>
     </div>
   );
 }

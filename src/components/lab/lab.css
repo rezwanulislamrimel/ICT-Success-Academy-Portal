@@ -1,0 +1,24 @@
+.lb{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 36px rgba(10,35,88,.12)}
+.lb-tabs{display:flex;gap:6px;padding:10px;overflow-x:auto;background:linear-gradient(135deg,#0A2358,#0B3A8C)}
+.lb-tabs button{font:inherit;font-weight:600;white-space:nowrap;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:12px;padding:9px 14px}
+.lb-tabs button[aria-selected=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lb-body{padding:18px}
+.lb-sub{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.lb-sub button{font:inherit;font-size:14px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px}
+.lb-sub button.on,.lb-sub button.go{background:var(--brand);color:#fff;border-color:var(--brand)}
+.lb-in{display:flex;gap:8px;margin:0 0 12px}
+.lb input,.lb select,.lb textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+.lb-in input{flex:1}.lb input.err{border-color:var(--bad)}
+.lb-row{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;margin-bottom:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.lb-row span{color:var(--muted)}.lb-row code,.lb code{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;overflow-wrap:anywhere;text-align:right}
+.lb-hint{color:var(--muted);font-size:14px;margin:10px 0 6px}
+.lb details{margin-top:8px;color:var(--muted)}
+.lb-scroll{overflow-x:auto}
+.lb-t{border-collapse:collapse;width:100%;margin:8px 0;font-size:15px}
+.lb-t th,.lb-t td{border:1px solid var(--line);padding:6px 12px;text-align:center}
+.lb-t th{background:var(--bg)}.lb-t td.out{font-weight:800;color:var(--brand)}
+.lb-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lb-split textarea,.lb-sql{font-family:ui-monospace,Menlo,Consolas,monospace!important;font-size:14px!important;min-height:230px;resize:vertical;line-height:1.5}
+.lb-sql{width:100%;min-height:90px;margin-bottom:10px;box-sizing:border-box}
+.lb-split iframe{width:100%;min-height:230px;border:1px solid var(--line);border-radius:10px;background:#fff}
+@media (max-width:760px){.lb-split{grid-template-columns:1fr}}
