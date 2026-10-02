@@ -61,10 +61,6 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        {/* ── MCQ Dashboard — standalone (নিজের header/footer আছে) ── */}
-        <Route path="/dashboard" element={<MCQDashboard />} />
-
-        {/* ── বাকি সব route এ Header + Footer ── */}
         <Route path="/*" element={
           <>
             <Header />
@@ -76,6 +72,7 @@ export default function App() {
                 <Route path="/lab"      element={<div className="wrap hx-sec"><Lab /></div>} />
                 <Route path="/about"    element={<About />} />
                 <Route path="/admission" element={<Admission />} />
+                <Route path="/dashboard" element={<MCQDashboard />} />
                 <Route path="*"         element={<Home />} />
               </Routes>
             </main>

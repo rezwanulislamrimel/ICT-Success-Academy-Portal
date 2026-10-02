@@ -183,25 +183,8 @@ function Dashboard({ user, onLogout }) {
 
   return (
     <div className="mcqd-dash-page">
-      {/* ── Navbar ── */}
-      <nav className="mcqd-topnav">
-        <div className="mcqd-nav-logo">
-          <div className="mcqd-nav-icon">🎯</div>
-          <div>
-            <div className="mcqd-nav-title">ICT Success Academy</div>
-            <div className="mcqd-nav-sub">MCQ Dashboard</div>
-          </div>
-        </div>
-        <div className="mcqd-nav-right">
-          <div className="mcqd-nav-avatar">
-            <Avatar photo={user.photo} name={user.name} />
-          </div>
-          <button className="mcqd-btn-logout" onClick={handleLogout}>🚪 লগআউট</button>
-        </div>
-      </nav>
-
       {/* ── Content ── */}
-      <div className="mcqd-dash-content">
+      <div className="mcqd-dash-content" style={{ marginTop: '32px' }}>
 
         {/* Greeting */}
         <div className="mcqd-greeting-row">
@@ -328,6 +311,13 @@ function Dashboard({ user, onLogout }) {
               </table>
             </div>
           )}
+        </div>
+
+        {/* Logout Section */}
+        <div style={{ marginTop: '32px', textAlign: 'center' }}>
+          <button className="mcqd-btn-logout" onClick={handleLogout} style={{ background: '#fee2e2', color: '#dc2626', borderColor: '#f87171', padding: '10px 24px', fontSize: '15px' }}>
+            🚪 লগআউট করুন
+          </button>
         </div>
 
       </div>
