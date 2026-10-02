@@ -33,6 +33,14 @@ import { Link, NavLink } from 'react-router-dom';
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ictUser');
+      if (saved) setUser(JSON.parse(saved));
+    } catch (_) {}
+  }, []);
 
   // Scroll hole header e floating effect ar blur baranor jonno
   useEffect(() => {
@@ -74,6 +82,17 @@ export default function Header() {
           <NavLink to="/about" className="hide-sm" onClick={() => setIsOpen(false)}>কেন আমরা</NavLink>
           <NavLink to="/admission" className="admission-pill" onClick={() => setIsOpen(false)}>ভর্তি 🚀</NavLink>
           
+          {/* Dashboard Dynamic Button */}
+          {user ? (
+            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} style={{ color: '#16a34a', fontWeight: 'bold' }}>
+              📊 {user.name.split(' ')[0]}'s Profile
+            </NavLink>
+          ) : (
+            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} style={{ color: '#0d9488', fontWeight: 'bold' }}>
+              📊 Login Dashboard
+            </NavLink>
+          )}
+
           <button id="theme" aria-label="থিম পরিবর্তন" onClick={toggleTheme}>◐</button>
         </nav>
 

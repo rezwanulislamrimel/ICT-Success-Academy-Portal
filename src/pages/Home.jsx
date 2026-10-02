@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Converter from '../components/Converter.jsx';
 import Lab from '../components/lab/Lab.jsx';
 import { LEVELS } from '../data.js';
 import '../home.css';
+
+// (Removed MCQButton from here)
 
 function useInView() {
   const ref = useRef(null);
@@ -55,8 +57,10 @@ export default function Home() {
             <span className="hx-badge"><i /> নতুন ব্যাচে ভর্তি চলছে</span>
             <h1>ICT শেখা হোক <em>সহজ</em>, বুঝে বুঝে</h1>
             <p className="lead">SSC, HSC, অনার্স ও ডিগ্রি — প্রতিটি লেভেলের ICT এক জায়গায়। চ্যাপ্টারভিত্তিক ক্লাস, প্র্যাকটিস প্রশ্ন, আর যেকোনো সময় AI সহায়ক।</p>
-            <Link className="btn primary" to="/admission">এখনই ভর্তি হও →</Link>{' '}
-            <Link className="btn ghost" to="/courses" style={{ color: '#fff', borderColor: 'rgba(255,255,255,.6)' }}>কোর্স দেখো</Link>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+              <Link className="btn primary" to="/admission">এখনই ভর্তি হও →</Link>
+              <Link className="btn ghost" to="/courses" style={{ color: '#fff', borderColor: 'rgba(255,255,255,.6)' }}>কোর্স দেখো</Link>
+            </div>
             <div className="hx-chips"><span>✔ চ্যাপ্টারভিত্তিক</span><span>✔ AI সহায়ক</span><Link to="/practice" style={{ color: 'inherit' }}><span>🎮 ফ্রি MCQ গেম</span></Link></div>
           </div>
           <Converter />

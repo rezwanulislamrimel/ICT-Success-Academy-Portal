@@ -49,6 +49,7 @@ import Practice from './pages/Practice.jsx';
 import Lab from './components/lab/Lab.jsx';
 import About from './pages/About.jsx';
 import Admission from './pages/Admission.jsx';
+import MCQDashboard from './mcq/MCQDashboard.jsx';
 
 export default function App() {
   const { pathname } = useLocation();
@@ -59,20 +60,30 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <Header />
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/practice" element={<Practice />} />
-          <Route path="/lab" element={<div className="wrap hx-sec"><Lab /></div>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/admission" element={<Admission />} />
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </main>
-      <Footer />
-      <AIChat />
+      <Routes>
+        {/* ── MCQ Dashboard — standalone (নিজের header/footer আছে) ── */}
+        <Route path="/dashboard" element={<MCQDashboard />} />
+
+        {/* ── বাকি সব route এ Header + Footer ── */}
+        <Route path="/*" element={
+          <>
+            <Header />
+            <main>
+              <Routes>
+                <Route path="/"         element={<Home />} />
+                <Route path="/courses"  element={<Courses />} />
+                <Route path="/practice" element={<Practice />} />
+                <Route path="/lab"      element={<div className="wrap hx-sec"><Lab /></div>} />
+                <Route path="/about"    element={<About />} />
+                <Route path="/admission" element={<Admission />} />
+                <Route path="*"         element={<Home />} />
+              </Routes>
+            </main>
+            <Footer />
+            <AIChat />
+          </>
+        } />
+      </Routes>
     </ErrorBoundary>
   );
 }

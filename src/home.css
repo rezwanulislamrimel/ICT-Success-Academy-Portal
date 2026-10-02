@@ -41,3 +41,31 @@
 .rv{opacity:0;transform:translateY(24px);transition:.7s}.rv.in{opacity:1;transform:none}
 @media (max-width:860px){.hx-stats,.hx-levels{grid-template-columns:1fr 1fr}.hx-feat,.hx-steps,.hx-ai{grid-template-columns:1fr}.hx-hero{padding:28px 16px}.hx-stats{margin:-18px 8px 0}}
 @media (prefers-reduced-motion:reduce){.hx-float,.hx-badge i{animation:none}.rv{opacity:1;transform:none;transition:none}}
+
+/* ── MCQ Dashboard card (Home page) ─────────────── */
+.hx-mcq-card{display:flex;align-items:center;gap:12px;margin-top:20px;border-radius:16px;padding:12px 16px;backdrop-filter:blur(10px);transition:.2s}
+
+/* Guest state */
+.hx-mcq-guest{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25)}
+.hx-mcq-guest-icon{font-size:28px;flex-shrink:0}
+.hx-mcq-guest-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.hx-mcq-guest-text strong{color:#fff;font-size:14px;font-weight:700}
+.hx-mcq-guest-text span{color:rgba(255,255,255,.7);font-size:12px}
+
+/* Logged-in state */
+.hx-mcq-user{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.3)}
+.hx-mcq-avatar{position:relative;flex-shrink:0;width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+.hx-mcq-avatar img{width:100%;height:100%;object-fit:cover}
+.hx-mcq-dot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#4ade80;border:2px solid rgba(255,255,255,.3)}
+.hx-mcq-info{flex:1;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.hx-mcq-info strong{color:#fff;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hx-mcq-info span{color:rgba(255,255,255,.65);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Button */
+.hx-mcq-btn{font:inherit;font-family:'Hind Siliguri',sans-serif;cursor:pointer;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;white-space:nowrap;background:rgba(255,255,255,.2);color:#fff;transition:.15s;border:1px solid rgba(255,255,255,.3)}
+.hx-mcq-btn:hover{background:rgba(255,255,255,.32);transform:translateY(-1px)}
+.hx-mcq-btn-dash{background:linear-gradient(135deg,#16a34a,#0d9488);border-color:transparent}
+.hx-mcq-btn-dash:hover{background:linear-gradient(135deg,#15803d,#0f766e)}
+
+@media (max-width:500px){.hx-mcq-guest-text span{display:none}}
+
