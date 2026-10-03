@@ -85,6 +85,13 @@ export default function BoardQuestions() {
                   {y}
                 </button>
               ))}
+              {/* Coming Soon placeholder */}
+              <button 
+                className="bq-year-btn coming-soon"
+                onClick={() => setYear(null)}
+              >
+                Coming Soon
+              </button>
             </div>
           </div>
         )}

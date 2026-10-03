@@ -82,14 +82,15 @@
   border-color: var(--accent);
   color: var(--accent);
 }
-.bq-year-btn.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+.bq-year-btn.coming-soon {
+  background: var(--bg);
+  border-color: var(--muted);
+  color: var(--muted);
+  cursor: default;
 }
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+.bq-year-btn.coming-soon:hover {
+  background: var(--bg);
+  border-color: var(--muted);
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
