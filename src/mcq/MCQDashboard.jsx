@@ -153,9 +153,14 @@ function LoginPage({ onLogin }) {
 // ════════════════════════════════════════════
 //  DASHBOARD PAGE
 // ════════════════════════════════════════════
-function Dashboard({ user, onLogout }) {
+function Dashboard({ user, onLogout, onUpdateUser }) {
   const [rankBarW, setRankBarW] = useState(0);
   const [perfBarW, setPerfBarW] = useState(0);
+
+  // Edit Mode States
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ ...user });
+  const editFileRef = useRef(null);
 
   const totalExams    = DEMO_EXAMS.length;
   const totalMarks    = DEMO_EXAMS.reduce((s, e) => s + e.obtained, 0);
@@ -181,6 +186,42 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
+  const startEdit = () => {
+    setEditData({ ...user });
+    setIsEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.id]: e.target.value });
+  };
+
+  const handleEditPhoto = (e) => {
+    const f = e.target.files[0];
+    if (f) {
+      if (f.size > 2 * 1024 * 1024) return alert("ছবি ২ MB এর ছোট হতে হবে।");
+      const r = new FileReader();
+      r.onload = (e) => setEditData({ ...editData, photo: e.target.result });
+      r.readAsDataURL(f);
+    }
+  };
+
+  const saveEdit = (e) => {
+    e.preventDefault();
+    if (!editData.name || !editData.mobile || !editData.institute) {
+      return alert("নাম, মোবাইল এবং প্রতিষ্ঠানের নাম অবশ্যই দিতে হবে।");
+    }
+    if (!/^01[3-9]\d{8}$/.test(editData.mobile)) {
+      return alert("সঠিক বাংলাদেশী মোবাইল নম্বর দিন।");
+    }
+    localStorage.setItem("ictUser", JSON.stringify(editData));
+    onUpdateUser(editData);
+    setIsEditing(false);
+  };
+
   return (
     <div className="mcqd-dash-page">
       {/* ── Content ── */}
@@ -199,18 +240,44 @@ function Dashboard({ user, onLogout }) {
         <div className="mcqd-top-row">
           {/* Profile */}
           <div className="mcqd-profile-card">
-            <div className="mcqd-profile-avatar-wrap">
-              <div className="mcqd-profile-avatar">
-                <Avatar photo={user.photo} name={user.name} />
-              </div>
-              <div className="mcqd-online-dot">✓</div>
-            </div>
-            <p className="mcqd-profile-name">{user.name}</p>
-            <p className="mcqd-profile-inst">{user.institute}</p>
-            <div className="mcqd-profile-tags">
-              <span className="mcqd-tag">📱 {user.mobile}</span>
-              {user.email && <span className="mcqd-tag">✉ {user.email}</span>}
-            </div>
+            
+            {!isEditing ? (
+              <>
+                <div className="mcqd-profile-avatar-wrap">
+                  <div className="mcqd-profile-avatar">
+                    <Avatar photo={user.photo} name={user.name} />
+                  </div>
+                  <div className="mcqd-online-dot">✓</div>
+                </div>
+                <p className="mcqd-profile-name">{user.name}</p>
+                <p className="mcqd-profile-inst">{user.institute}</p>
+                <div className="mcqd-profile-tags">
+                  <span className="mcqd-tag">📱 {user.mobile}</span>
+                  {user.email && <span className="mcqd-tag">✉ {user.email}</span>}
+                </div>
+              </>
+            ) : (
+              <form onSubmit={saveEdit} className="mcqd-edit-form">
+                <div className="mcqd-edit-avatar-picker" onClick={() => editFileRef.current.click()}>
+                  <div className="mcqd-profile-avatar">
+                    <Avatar photo={editData.photo} name={editData.name} />
+                  </div>
+                  <div className="mcqd-edit-avatar-overlay">📷</div>
+                </div>
+                <input ref={editFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEditPhoto} />
+                
+                <input id="name" value={editData.name} onChange={handleEditChange} className="mcqd-input" placeholder="আপনার নাম" required />
+                <input id="mobile" value={editData.mobile} onChange={handleEditChange} className="mcqd-input" placeholder="মোবাইল নম্বর" type="tel" maxLength={11} required />
+                <input id="institute" value={editData.institute} onChange={handleEditChange} className="mcqd-input" placeholder="প্রতিষ্ঠানের নাম" required />
+                <input id="email" value={editData.email} onChange={handleEditChange} className="mcqd-input" placeholder="ইমেইল (ঐচ্ছিক)" type="email" />
+                
+                <div className="mcqd-edit-actions">
+                  <button type="submit" className="mcqd-btn-save">সেভ করুন</button>
+                  <button type="button" onClick={cancelEdit} className="mcqd-btn-cancel">বাতিল</button>
+                </div>
+              </form>
+            )}
+            
           </div>
 
           {/* Rank */}
@@ -313,9 +380,25 @@ function Dashboard({ user, onLogout }) {
           )}
         </div>
 
-        {/* Logout Section */}
-        <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <button className="mcqd-btn-logout" onClick={handleLogout} style={{ background: '#fee2e2', color: '#dc2626', borderColor: '#f87171', padding: '10px 24px', fontSize: '15px' }}>
+        {/* Action Buttons Section */}
+        <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          {!isEditing && (
+            <button 
+              className="mcqd-btn-edit-profile" 
+              onClick={() => { 
+                startEdit(); 
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+              }} 
+              style={{ margin: 0, padding: '10px 24px', fontSize: '15px' }}
+            >
+              Edit Profile
+            </button>
+          )}
+          <button 
+            className="mcqd-btn-logout" 
+            onClick={handleLogout} 
+            style={{ background: '#fee2e2', color: '#dc2626', borderColor: '#f87171', padding: '10px 24px', fontSize: '15px', cursor: 'pointer', borderRadius: '20px' }}
+          >
             🚪 লগআউট করুন
           </button>
         </div>
@@ -335,5 +418,5 @@ export default function MCQDashboard() {
   });
 
   if (!user) return <LoginPage onLogin={setUser} />;
-  return <Dashboard user={user} onLogout={() => setUser(null)} />;
+  return <Dashboard user={user} onLogout={() => setUser(null)} onUpdateUser={setUser} />;
 }
