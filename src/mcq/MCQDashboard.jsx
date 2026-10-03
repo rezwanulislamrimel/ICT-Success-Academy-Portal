@@ -52,6 +52,25 @@ function Avatar({ photo, name, className = "" }) {
   return <span className={className}>{name?.charAt(0)?.toUpperCase() ?? "?"}</span>;
 }
 
+// ── Field Component — must be outside LoginPage to prevent focus loss ──
+function Field({ id, label, required, type = "text", placeholder, maxLength, value, onChange, error }) {
+  return (
+    <div className="mcqd-form-group">
+      <label className="mcqd-label" htmlFor={id}>
+        {label}
+        {required && <span className="mcqd-req">*</span>}
+        {!required && <span className="mcqd-opt"> (ঐচ্ছিক)</span>}
+      </label>
+      <input
+        id={id} type={type} placeholder={placeholder} maxLength={maxLength}
+        className={`mcqd-input${error ? " mcqd-input-error" : ""}`}
+        value={value} onChange={onChange}
+      />
+      {error && <p className="mcqd-error-msg">⚠ {error}</p>}
+    </div>
+  );
+}
+
 // ════════════════════════════════════════════
 //  LOGIN PAGE
 // ════════════════════════════════════════════
@@ -90,24 +109,7 @@ function LoginPage({ onLogin }) {
     onLogin(user);
   };
 
-// ── Field Component — must be outside LoginPage to prevent focus loss ──
-function Field({ id, label, required, type = "text", placeholder, maxLength, value, onChange, error }) {
-  return (
-    <div className="mcqd-form-group">
-      <label className="mcqd-label" htmlFor={id}>
-        {label}
-        {required && <span className="mcqd-req">*</span>}
-        {!required && <span className="mcqd-opt"> (ঐচ্ছিক)</span>}
-      </label>
-      <input
-        id={id} type={type} placeholder={placeholder} maxLength={maxLength}
-        className={`mcqd-input${error ? " mcqd-input-error" : ""}`}
-        value={value} onChange={onChange}
-      />
-      {error && <p className="mcqd-error-msg">⚠ {error}</p>}
-    </div>
-  );
-}
+
 
   return (
     <div className="mcqd-login-bg">
