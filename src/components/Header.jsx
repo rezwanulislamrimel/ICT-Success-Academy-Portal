@@ -84,16 +84,13 @@ export default function Header() {
           <NavLink to="/practice" onClick={() => setIsOpen(false)}>
             🎮 ফ্রি MCQ
           </NavLink>
-          <a
-            href="#"
-            onClick={(e) => {
-              openAI(e);
-              setIsOpen(false);
-            }}
+          <NavLink
+            to="/ai-assistant"
+            onClick={() => setIsOpen(false)}
             className="ai-link"
           >
             AI সহায়ক ✨
-          </a>
+          </NavLink>
           <NavLink
             to="/about"
             className="hide-sm"
