@@ -115,9 +115,9 @@ export default function BoardQuestions() {
                   }}
                 />
                 <div className="bq-missing-image" style={{ display: 'none' }}>
-                  <p>🖼️ ছবি পাওয়া যায়নি!</p>
-                  <p className="bq-empty-sub">দয়া করে <b>public/board-questions/</b> ফোল্ডারে <b>{currentQuestions.split('/').pop()}</b> নামে ছবিটি রাখুন।</p>
-                </div>
+  <p>⏳ Coming Soon</p>
+  <p className="bq-empty-sub">এই বছরের প্রশ্নগুলো শীঘ্রই আপলোড করা হবে।</p>
+</div>
               </div>
             ) : (
               <div className="bq-empty">
