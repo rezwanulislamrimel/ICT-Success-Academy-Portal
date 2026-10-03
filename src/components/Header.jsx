@@ -111,10 +111,10 @@ export default function Header() {
 
           {/* Login / Profile Button */}
           {user ? (
-            <NavLink
+            <Link
               to="/dashboard"
               onClick={() => setIsOpen(false)}
-              className={() => "nav-profile-btn"}
+              className="nav-profile-btn"
             >
               <span className="nav-avatar-circle">
                 {user.photo
@@ -123,15 +123,15 @@ export default function Header() {
                 }
               </span>
               <span>{user.name.split(" ")[0]}</span>
-            </NavLink>
+            </Link>
           ) : (
-            <NavLink
+            <Link
               to="/dashboard"
               onClick={() => setIsOpen(false)}
-              className={() => "nav-login-btn"}
+              className="nav-login-btn"
             >
               Login
-            </NavLink>
+            </Link>
           )}
 
           <button id="theme" aria-label="থিম পরিবর্তন" onClick={toggleTheme}>
