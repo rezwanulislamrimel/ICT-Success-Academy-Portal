@@ -102,6 +102,13 @@ export default function Header() {
             কেন আমরা
           </NavLink>
           <NavLink
+            to="/board-questions"
+            onClick={() => setIsOpen(false)}
+            style={{ fontWeight: "600", color: "#f59e0b" }}
+          >
+            📚 বোর্ড প্রশ্ন
+          </NavLink>
+          <NavLink
             to="/cv-builder"
             className="cv-builder-nav-btn"
             style={{ fontWeight: "600", color: "#16a34a" }}
