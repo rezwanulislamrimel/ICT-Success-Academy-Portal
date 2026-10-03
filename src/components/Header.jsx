@@ -213,6 +213,26 @@ export default function Header() {
           object-fit: cover;
           border-radius: 50%;
         }
+
+        /* Force kill ANY active/aria-current styling on login & profile buttons */
+        .nav-login-btn.active,
+        .nav-login-btn[aria-current],
+        .nav-login-btn[aria-current="page"],
+        .nav-profile-btn.active,
+        .nav-profile-btn[aria-current],
+        .nav-profile-btn[aria-current="page"] {
+          background: linear-gradient(135deg, #16a34a, #0d9488) !important;
+          color: #fff !important;
+          box-shadow: 0 3px 14px rgba(22,163,74,0.4) !important;
+          transform: none !important;
+          animation: none !important;
+          border-bottom: none !important;
+        }
+        .nav-profile-btn.active,
+        .nav-profile-btn[aria-current],
+        .nav-profile-btn[aria-current="page"] {
+          background: linear-gradient(135deg, #14532d, #16a34a) !important;
+        }
       `}</style>
     </header>
   );
