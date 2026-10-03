@@ -109,22 +109,20 @@ export default function Header() {
             ভর্তি 🚀
           </NavLink>
 
-          {/* Dashboard Dynamic Button */}
+          {/* Login / Profile Button */}
           {user ? (
-            <NavLink
-              to="/dashboard"
-              onClick={() => setIsOpen(false)}
-              style={{ color: "#16a34a", fontWeight: "bold" }}
-            >
-              📊 {user.name.split(" ")[0]}'s Profile
+            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} className="nav-profile-btn">
+              <span className="nav-avatar-circle">
+                {user.photo
+                  ? <img src={user.photo} alt="" className="nav-avatar-img" />
+                  : user.name.charAt(0).toUpperCase()
+                }
+              </span>
+              <span>{user.name.split(" ")[0]}</span>
             </NavLink>
           ) : (
-            <NavLink
-              to="/dashboard"
-              onClick={() => setIsOpen(false)}
-              style={{ color: "#0d9488", fontWeight: "bold" }}
-            >
-              📊 Login Dashboard
+            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} className="nav-login-btn">
+              🔑 Login
             </NavLink>
           )}
 
@@ -144,6 +142,70 @@ export default function Header() {
           <span></span>
         </button>
       </div>
+
+      <style>{`
+        .nav-login-btn {
+          display: inline-flex !important;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #16a34a, #0d9488) !important;
+          color: #fff !important;
+          font-weight: 700 !important;
+          font-size: 14px !important;
+          padding: 8px 20px !important;
+          border-radius: 50px !important;
+          text-decoration: none !important;
+          transition: transform 0.2s, box-shadow 0.2s !important;
+          box-shadow: 0 3px 14px rgba(22,163,74,0.4) !important;
+          letter-spacing: 0.3px;
+        }
+        .nav-login-btn:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 22px rgba(22,163,74,0.55) !important;
+          color: #fff !important;
+          opacity: 0.93;
+        }
+        .nav-profile-btn {
+          display: inline-flex !important;
+          align-items: center;
+          gap: 8px;
+          background: linear-gradient(135deg, #14532d, #16a34a) !important;
+          color: #fff !important;
+          font-weight: 700 !important;
+          font-size: 14px !important;
+          padding: 5px 16px 5px 5px !important;
+          border-radius: 50px !important;
+          text-decoration: none !important;
+          transition: transform 0.2s, box-shadow 0.2s !important;
+          box-shadow: 0 3px 14px rgba(20,83,45,0.4) !important;
+        }
+        .nav-profile-btn:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 22px rgba(22,163,74,0.55) !important;
+          color: #fff !important;
+        }
+        .nav-avatar-circle {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.22);
+          border: 2px solid rgba(255,255,255,0.5);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 800;
+          color: #fff;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .nav-avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      `}</style>
     </header>
   );
 }
