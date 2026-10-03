@@ -350,15 +350,15 @@
     top: 0;
     width: 210mm !important;
     min-height: 297mm !important;
-    padding: 0 !important;
+    padding: 15mm !important; /* Safe padding for print since @page margin is 0 */
     box-shadow: none !important;
     margin: 0 !important;
   }
 
-  /* Optional: Force A4 page size in print settings */
+  /* Force A4 page size in print settings and remove default headers/footers */
   @page {
     size: A4;
-    margin: 20mm;
+    margin: 0mm;
   }
 }
 

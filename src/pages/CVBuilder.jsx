@@ -5,31 +5,31 @@ export default function CVBuilder() {
   const [template, setTemplate] = useState("professional");
   
   const [cvData, setCvData] = useState({
-    name: "Mohammad Abdullah",
-    title: "Software Engineer",
+    name: "ICT Success Academy",
+    title: "Best ICT Learning Platform",
     phone: "+880 1711-000000",
-    email: "abdullah@email.com",
-    linkedin: "linkedin.com/in/abdullah",
-    github: "github.com/abdullah",
-    summary: "Passionate Software Engineer with 3+ years of experience in web development, specializing in React, Node.js, and modern cloud infrastructure.",
+    email: "info@ictsuccess.com",
+    linkedin: "linkedin.com/company/ictsuccess",
+    github: "github.com/ictsuccess",
+    summary: "ICT Success Academy is the most trusted platform for students learning Information and Communication Technology. We provide world-class education for HSC, SSC, and Degree students.",
     experience: [
       {
         id: 1,
-        company: "Tech Solutions BD",
-        role: "Frontend Developer",
-        duration: "Jan 2024 - Present",
-        details: "• Developed responsive UI using React and Tailwind CSS.\n• Improved website load time by 30%.\n• Collaborated with designers for better UX."
+        company: "ICT Success Academy",
+        role: "Lead Instructor",
+        duration: "Jan 2020 - Present",
+        details: "• Taught over 10,000 students online and offline.\n• Created comprehensive MCQ modules and mock tests.\n• Solved complex programming and database problems easily."
       }
     ],
     education: [
       {
         id: 1,
-        institution: "Dhaka University",
-        degree: "BSc in Computer Science",
-        year: "2019 - 2023"
+        institution: "Success University",
+        degree: "BSc in Computer Science & Engineering",
+        year: "2015 - 2019"
       }
     ],
-    skills: "JavaScript, React, Node.js, Express, MongoDB, Tailwind CSS, Git"
+    skills: "ICT, C Programming, HTML/CSS, Database Management, Logic Gates, Networking"
   });
 
   const handleChange = (e) => {
