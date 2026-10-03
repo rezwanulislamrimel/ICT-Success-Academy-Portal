@@ -178,14 +178,18 @@ import React from 'react';
       open && h('div',{className:'chat-panel',role:'dialog','aria-label':'ICT AI সহায়ক'},
         h('div',{className:'chat-head'},
           h('div',null,h('b',null,'ICT AI সহায়ক'),h('small',null,'শুধু ICT বিষয়ের প্রশ্নের উত্তর দেয়')),
-          h('button',{onClick:function(){ if(!busy) setMsgs([]); },disabled:busy,'aria-label':'নতুন চ্যাট'},'নতুন চ্যাট')),
+          h('div', {style: {display: 'flex', gap: '8px'}},
+            h('button',{onClick:function(){ if(!busy) setMsgs([]); },disabled:busy,'aria-label':'নতুন চ্যাট'},'নতুন চ্যাট'),
+            h('button',{onClick:function(){ setOpen(false); },'aria-label':'বন্ধ করো',style: {fontWeight: 'bold', fontSize: '16px'}},'✕')
+          )
+        ),
         h('div',{className:'chat-body','aria-live':'polite'},body,h('div',{ref:end})),
         h('div',{className:'chat-foot'},
           micBtn, h('textarea',{ref:inp,rows:1,value:text,placeholder:'প্রশ্ন লেখো…','aria-label':'প্রশ্ন লেখো',maxLength:1000,onChange:function(e){ setText(e.target.value); },onKeyDown:onKey}),
           busy
             ? h('button',{onClick:function(){ if(ctl.current) ctl.current.abort(); }},'থামাও')
             : h('button',{onClick:function(){ send(text); },disabled:!text.trim()},'পাঠাও'))),
-      h('button',{className:'chat-fab','aria-expanded':open,onClick:function(){ setOpen(!open); }},open?'বন্ধ করো':'AI-কে জিজ্ঞেস করো')
+      !open && h('button',{className:'chat-fab','aria-expanded':open,onClick:function(){ setOpen(true); }},'AI-কে জিজ্ঞেস করো')
     );
   }
 
