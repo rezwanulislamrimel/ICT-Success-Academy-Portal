@@ -106,12 +106,16 @@ export default function Header() {
             className="admission-pill"
             onClick={() => setIsOpen(false)}
           >
-            ভর্তি 🚀
+            ভর্তি
           </NavLink>
 
           {/* Login / Profile Button */}
           {user ? (
-            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} className="nav-profile-btn">
+            <NavLink
+              to="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className={() => "nav-profile-btn"}
+            >
               <span className="nav-avatar-circle">
                 {user.photo
                   ? <img src={user.photo} alt="" className="nav-avatar-img" />
@@ -121,8 +125,12 @@ export default function Header() {
               <span>{user.name.split(" ")[0]}</span>
             </NavLink>
           ) : (
-            <NavLink to="/dashboard" onClick={() => setIsOpen(false)} className="nav-login-btn">
-              🔑 Login
+            <NavLink
+              to="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className={() => "nav-login-btn"}
+            >
+              Login
             </NavLink>
           )}
 
