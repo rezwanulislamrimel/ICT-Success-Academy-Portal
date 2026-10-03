@@ -577,17 +577,98 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 /* -- Profile Edit -- */
-.mcqd-btn-edit-profile{margin-top:16px;background:linear-gradient(135deg,#16a34a,#0d9488);border:none;color:#fff;border-radius:20px;padding:6px 16px;font-size:13px;cursor:pointer;transition:.2s;font-family:inherit;}
-.mcqd-btn-edit-profile:hover{background:rgba(255,255,255,.2)}
-.mcqd-edit-form{display:flex;flex-direction:column;gap:12px;width:100%}
-.mcqd-edit-avatar-picker{position:relative;margin:0 auto 12px;cursor:pointer;width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.3)}
-.mcqd-edit-avatar-picker .mcqd-profile-avatar{width:100%;height:100%;border:none;margin:0}
-.mcqd-edit-avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;opacity:0;transition:.2s}
-.mcqd-edit-avatar-picker:hover .mcqd-edit-avatar-overlay{opacity:1}
-.mcqd-edit-form .mcqd-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);padding:10px 14px;border-radius:10px;color:#fff;font-size:14px;outline:none;font-family:inherit;}
-.mcqd-edit-form .mcqd-input:focus{border-color:#14b8a6;background:rgba(255,255,255,.1)}
-.mcqd-edit-actions{display:flex;gap:10px;margin-top:8px}
-.mcqd-btn-save{flex:1;background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;}
-.mcqd-btn-cancel{flex:1;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;}
-.mcqd-btn-save:hover{opacity:0.9}
-.mcqd-btn-cancel:hover{background:rgba(255,255,255,.2)}
+/* Edit Profile Button */
+.mcqd-btn-edit-profile {
+  background: linear-gradient(135deg, #16a34a, #0d9488);
+  border: none;
+  color: #fff;
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  font-family: inherit;
+  box-shadow: 0 3px 12px rgba(22,163,74,0.4);
+}
+.mcqd-btn-edit-profile:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(22,163,74,0.5);
+}
+
+/* Edit Form */
+.mcqd-edit-form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+
+/* Avatar picker */
+.mcqd-edit-avatar-picker {
+  position: relative;
+  margin: 0 auto 8px;
+  cursor: pointer;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #16a34a;
+}
+.mcqd-edit-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 22px;
+  opacity: 0;
+  transition: .2s;
+}
+.mcqd-edit-avatar-picker:hover .mcqd-edit-avatar-overlay { opacity: 1; }
+
+/* Edit form inputs — dark background, white text, clearly visible */
+.mcqd-edit-form .mcqd-input {
+  width: 100%;
+  background: #1a3a2a;
+  border: 1.5px solid #4ade80;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+.mcqd-edit-form .mcqd-input::placeholder { color: #86efac; opacity: 1; }
+.mcqd-edit-form .mcqd-input:focus {
+  border-color: #0d9488;
+  background: #14532d;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25);
+}
+
+/* Edit form buttons */
+.mcqd-edit-actions { display: flex; gap: 10px; margin-top: 8px; }
+.mcqd-btn-save {
+  flex: 1;
+  background: linear-gradient(135deg, #16a34a, #0d9488);
+  color: #fff;
+  border: none;
+  padding: 11px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+.mcqd-btn-cancel {
+  flex: 1;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+.mcqd-btn-save:hover   { opacity: 0.88; }
+.mcqd-btn-cancel:hover { background: rgba(255,255,255,.18); }
