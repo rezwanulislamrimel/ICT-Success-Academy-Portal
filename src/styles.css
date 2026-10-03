@@ -414,8 +414,8 @@ nav a.active {
 
 
 /* --- Ultra-Premium Electric Violet / Indigo Active Theme --- */
-nav a.active, 
-nav a[aria-current="page"] {
+nav a.active:not(.nav-login-btn):not(.nav-profile-btn), 
+nav a[aria-current="page"]:not(.nav-login-btn):not(.nav-profile-btn) {
   background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
   color: #ffffff !important;
   font-weight: 600 !important;
@@ -495,8 +495,8 @@ nav a:hover {
   }
 }
 /* --- Active / Selected Menu Smooth Animation & Glow --- */
-nav a.active, 
-nav a[aria-current="page"] {
+nav a.active:not(.nav-login-btn):not(.nav-profile-btn), 
+nav a[aria-current="page"]:not(.nav-login-btn):not(.nav-profile-btn) {
   background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
   color: #fff !important;
   font-weight: 600 !important;
@@ -639,4 +639,4 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-nav a.active{color:var(--brand);border-bottom:2px solid var(--accent)}
+nav a.active:not(.nav-login-btn):not(.nav-profile-btn){color:var(--brand);border-bottom:2px solid var(--accent)}
