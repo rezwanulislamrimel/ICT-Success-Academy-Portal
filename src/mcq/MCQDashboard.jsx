@@ -90,7 +90,9 @@ function LoginPage({ onLogin }) {
     onLogin(user);
   };
 
-  const Field = ({ id, label, required, type = "text", placeholder, maxLength }) => (
+// ── Field Component — must be outside LoginPage to prevent focus loss ──
+function Field({ id, label, required, type = "text", placeholder, maxLength, value, onChange, error }) {
+  return (
     <div className="mcqd-form-group">
       <label className="mcqd-label" htmlFor={id}>
         {label}
@@ -99,12 +101,13 @@ function LoginPage({ onLogin }) {
       </label>
       <input
         id={id} type={type} placeholder={placeholder} maxLength={maxLength}
-        className={`mcqd-input${errors[id] ? " mcqd-input-error" : ""}`}
-        value={form[id]} onChange={set(id)}
+        className={`mcqd-input${error ? " mcqd-input-error" : ""}`}
+        value={value} onChange={onChange}
       />
-      {errors[id] && <p className="mcqd-error-msg">⚠ {errors[id]}</p>}
+      {error && <p className="mcqd-error-msg">⚠ {error}</p>}
     </div>
   );
+}
 
   return (
     <div className="mcqd-login-bg">
@@ -134,10 +137,10 @@ function LoginPage({ onLogin }) {
             </div>
           </div>
 
-          <Field id="name"      label="পূর্ণ নাম"         required placeholder="আপনার পূর্ণ নাম লিখুন" />
-          <Field id="mobile"    label="মোবাইল নম্বর"      required type="tel" placeholder="০১XXXXXXXXX" maxLength={11} />
-          <Field id="institute" label="প্রতিষ্ঠানের নাম"  required placeholder="স্কুল / কলেজ / বিশ্ববিদ্যালয়ের নাম" />
-          <Field id="email"     label="ইমেইল"                       type="email" placeholder="example@gmail.com" />
+          <Field id="name"      label="পূর্ণ নাম"         required placeholder="আপনার পূর্ণ নাম লিখুন"                    value={form.name}      onChange={set("name")}      error={errors.name} />
+          <Field id="mobile"    label="মোবাইল নম্বর"      required type="tel" placeholder="০১XXXXXXXXX" maxLength={11}  value={form.mobile}    onChange={set("mobile")}    error={errors.mobile} />
+          <Field id="institute" label="প্রতিষ্ঠানের নাম"  required placeholder="স্কুল / কলেজ / বিশ্ববিদ্যালয়ের নাম"       value={form.institute} onChange={set("institute")} error={errors.institute} />
+          <Field id="email"     label="ইমেইল"             type="email" placeholder="example@gmail.com"                      value={form.email}     onChange={set("email")}     error={errors.email} />
 
           <button type="submit" className="mcqd-btn-login">🚀 ড্যাশবোর্ডে প্রবেশ করুন</button>
         </form>
