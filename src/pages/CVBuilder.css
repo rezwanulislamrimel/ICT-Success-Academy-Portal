@@ -1,0 +1,387 @@
+/* ─── CV BUILDER LAYOUT ─── */
+.cvb-container {
+  display: flex;
+  height: calc(100vh - 70px); /* Adjust based on your header height */
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ─── LEFT: EDITOR PANE ─── */
+.cvb-editor {
+  width: 450px;
+  min-width: 450px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cvb-editor-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cvb-editor-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--ink);
+}
+
+.cvb-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.cvb-select {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.cvb-btn-download {
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #16a34a, #059669);
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.cvb-btn-download:hover {
+  transform: translateY(-2px);
+}
+
+.cvb-form {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cvb-section {
+  margin-bottom: 30px;
+}
+
+.cvb-section h3 {
+  font-size: 16px;
+  color: var(--brand);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cvb-section input,
+.cvb-section textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.cvb-section input:focus, .cvb-section textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+.cvb-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cvb-item-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.cvb-btn-add {
+  width: 100%;
+  padding: 10px;
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+  border: 1px dashed #16a34a;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cvb-btn-remove {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+/* ─── RIGHT: PREVIEW PANE ─── */
+.cvb-preview-pane {
+  flex: 1;
+  background: #525659; /* Standard PDF viewer background */
+  overflow-y: auto;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.cv-document {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  padding: 20mm;
+  color: #333;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  box-sizing: border-box;
+}
+
+/* ─── TEMPLATES ─── */
+
+/* Professional (ATS Friendly) */
+.template-professional .cv-name {
+  font-size: 28px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0 0 5px 0;
+  text-align: center;
+  color: #000;
+}
+.template-professional .cv-title {
+  font-size: 16px;
+  text-align: center;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+  color: #444;
+}
+.template-professional .cv-contacts {
+  text-align: center;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.template-professional .cv-section-title {
+  font-size: 16px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #000;
+  margin: 20px 0 10px 0;
+  padding-bottom: 4px;
+  color: #000;
+}
+.template-professional .cv-summary,
+.template-professional .cv-skills,
+.template-professional .cv-exp-details p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 5px 0;
+}
+.template-professional .cv-exp-head,
+.template-professional .cv-edu-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 2px;
+  color: #000;
+}
+.template-professional .cv-exp-company,
+.template-professional .cv-edu-institution {
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #444;
+}
+.template-professional .cv-exp-item,
+.template-professional .cv-edu-item {
+  margin-bottom: 15px;
+}
+
+/* Modern */
+.template-modern .cv-header {
+  border-bottom: 3px solid #16a34a;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+.template-modern .cv-name {
+  font-size: 32px;
+  color: #16a34a;
+  margin: 0 0 5px 0;
+}
+.template-modern .cv-title {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 10px 0;
+}
+.template-modern .cv-contacts {
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #555;
+}
+.template-modern .cv-section-title {
+  font-size: 18px;
+  color: #16a34a;
+  margin: 25px 0 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.template-modern .cv-summary,
+.template-modern .cv-skills,
+.template-modern .cv-exp-details p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  margin: 0 0 5px 0;
+}
+.template-modern .cv-exp-head,
+.template-modern .cv-edu-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  color: #222;
+}
+.template-modern .cv-exp-company,
+.template-modern .cv-edu-institution {
+  font-weight: 500;
+  color: #16a34a;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.template-modern .cv-exp-item,
+.template-modern .cv-edu-item {
+  margin-bottom: 20px;
+}
+
+/* Minimal */
+.template-minimal {
+  font-family: "Georgia", serif;
+}
+.template-minimal .cv-name {
+  font-size: 26px;
+  margin: 0 0 10px 0;
+  font-weight: normal;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+.template-minimal .cv-title {
+  font-size: 14px;
+  font-style: italic;
+  margin: 0 0 15px 0;
+}
+.template-minimal .cv-contacts {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 30px;
+}
+.template-minimal .cv-section-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #333;
+  margin: 25px 0 15px 0;
+}
+.template-minimal .cv-summary,
+.template-minimal .cv-skills,
+.template-minimal .cv-exp-details p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0 0 5px 0;
+}
+.template-minimal .cv-exp-head,
+.template-minimal .cv-edu-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.template-minimal .cv-exp-company,
+.template-minimal .cv-edu-institution {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 8px;
+}
+.template-minimal .cv-exp-item,
+.template-minimal .cv-edu-item {
+  margin-bottom: 20px;
+}
+
+
+/* ─── PRINT STYLES ─── */
+@media print {
+  /* Hide EVERYTHING on the page except the CV document itself */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Reset background to white for printing */
+  body {
+    background: white !important;
+  }
+
+  .cv-document, .cv-document * {
+    visibility: visible;
+  }
+  
+  .cv-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  /* Optional: Force A4 page size in print settings */
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 900px) {
+  .cvb-container {
+    flex-direction: column;
+    overflow: auto;
+    height: auto;
+  }
+  .cvb-editor {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .cvb-preview-pane {
+    padding: 20px 10px;
+  }
+  .cv-document {
+    width: 100%;
+    min-height: auto;
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}

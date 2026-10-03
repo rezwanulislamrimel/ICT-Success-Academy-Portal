@@ -49,6 +49,7 @@ import Practice from './pages/Practice.jsx';
 import Lab from './components/lab/Lab.jsx';
 import About from './pages/About.jsx';
 import Admission from './pages/Admission.jsx';
+import CVBuilder from './pages/CVBuilder.jsx';
 import MCQDashboard from './mcq/MCQDashboard.jsx';
 
 // ── Stable layout — defined outside App so it never remounts ──
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/lab"       element={<div className="wrap hx-sec"><Lab /></div>} />
           <Route path="/about"     element={<About />} />
           <Route path="/admission" element={<Admission />} />
+          <Route path="/cv-builder" element={<CVBuilder />} />
           <Route path="/dashboard" element={<MCQDashboard />} />
           <Route path="*"          element={<Home />} />
         </Route>

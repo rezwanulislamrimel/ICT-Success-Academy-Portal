@@ -102,6 +102,14 @@ export default function Header() {
             কেন আমরা
           </NavLink>
           <NavLink
+            to="/cv-builder"
+            className="cv-builder-nav-btn"
+            style={{ fontWeight: "600", color: "#16a34a" }}
+            onClick={() => setIsOpen(false)}
+          >
+            📄 Build CV
+          </NavLink>
+          <NavLink
             to="/admission"
             className="admission-pill"
             onClick={() => setIsOpen(false)}
