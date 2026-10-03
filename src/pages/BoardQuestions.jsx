@@ -7,30 +7,30 @@ import "./BoardQuestions.css";
 // Image files should be placed inside: public/board-questions/
 const QUESTION_DB = {
   HSC: {
+    "2026": { MCQ: "/board-questions/hsc_2026_mcq.jpg", CQ: "/board-questions/hsc_2026_cq.jpg" },
+    "2025": { MCQ: "/board-questions/hsc_2025_mcq.jpg", CQ: "/board-questions/hsc_2025_cq.jpg" },
     "2024": { MCQ: "/board-questions/hsc_2024_mcq.jpg", CQ: "/board-questions/hsc_2024_cq.jpg" },
     "2023": { MCQ: "/board-questions/hsc_2023_mcq.jpg", CQ: "/board-questions/hsc_2023_cq.jpg" },
     "2022": { MCQ: "/board-questions/hsc_2022_mcq.jpg", CQ: "/board-questions/hsc_2022_cq.jpg" },
     "2021": { MCQ: "/board-questions/hsc_2021_mcq.jpg", CQ: "/board-questions/hsc_2021_cq.jpg" },
     "2020": { MCQ: "/board-questions/hsc_2020_mcq.jpg", CQ: "/board-questions/hsc_2020_cq.jpg" },
     "2019": { MCQ: "/board-questions/hsc_2019_mcq.jpg", CQ: "/board-questions/hsc_2019_cq.jpg" },
-    "2018": { MCQ: "/board-questions/hsc_2018_mcq.jpg", CQ: "/board-questions/hsc_2018_cq.jpg" },
-    "2017": { MCQ: "/board-questions/hsc_2017_mcq.jpg", CQ: "/board-questions/hsc_2017_cq.jpg" },
-    "2016": { MCQ: "/board-questions/hsc_2016_mcq.jpg", CQ: "/board-questions/hsc_2016_cq.jpg" }
+    "2018": { MCQ: "/board-questions/hsc_2018_mcq.jpg", CQ: "/board-questions/hsc_2018_cq.jpg" }
   },
   SSC: {
+    "2026": { MCQ: "/board-questions/ssc_2026_mcq.jpg", CQ: "/board-questions/ssc_2026_cq.jpg" },
+    "2025": { MCQ: "/board-questions/ssc_2025_mcq.jpg", CQ: "/board-questions/ssc_2025_cq.jpg" },
     "2024": { MCQ: "/board-questions/ssc_2024_mcq.jpg", CQ: "/board-questions/ssc_2024_cq.jpg" },
     "2023": { MCQ: "/board-questions/ssc_2023_mcq.jpg", CQ: "/board-questions/ssc_2023_cq.jpg" },
     "2022": { MCQ: "/board-questions/ssc_2022_mcq.jpg", CQ: "/board-questions/ssc_2022_cq.jpg" },
     "2021": { MCQ: "/board-questions/ssc_2021_mcq.jpg", CQ: "/board-questions/ssc_2021_cq.jpg" },
     "2020": { MCQ: "/board-questions/ssc_2020_mcq.jpg", CQ: "/board-questions/ssc_2020_cq.jpg" },
     "2019": { MCQ: "/board-questions/ssc_2019_mcq.jpg", CQ: "/board-questions/ssc_2019_cq.jpg" },
-    "2018": { MCQ: "/board-questions/ssc_2018_mcq.jpg", CQ: "/board-questions/ssc_2018_cq.jpg" },
-    "2017": { MCQ: "/board-questions/ssc_2017_mcq.jpg", CQ: "/board-questions/ssc_2017_cq.jpg" },
-    "2016": { MCQ: "/board-questions/ssc_2016_mcq.jpg", CQ: "/board-questions/ssc_2016_cq.jpg" }
+    "2018": { MCQ: "/board-questions/ssc_2018_mcq.jpg", CQ: "/board-questions/ssc_2018_cq.jpg" }
   }
 };
 
-const YEARS = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+const YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 
 export default function BoardQuestions() {
   const [level, setLevel] = useState(null); // 'SSC' or 'HSC'
@@ -47,7 +47,7 @@ export default function BoardQuestions() {
     <div className="bq-container wrap">
       <div className="bq-header">
         <h1>📚 দিনাজপুর বোর্ড প্রশ্ন আর্কাইভ</h1>
-        <p>SSC এবং HSC এর ২০১৬-২০২৪ সালের দিনাজপুর বোর্ডের সকল প্রশ্ন (MCQ ও CQ)</p>
+        <p>SSC এবং HSC এর ২০১৮-২০২৬ সালের দিনাজপুর বোর্ডের সকল প্রশ্ন (MCQ ও CQ)</p>
       </div>
 
       <div className="bq-selectors">
