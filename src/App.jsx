@@ -37,7 +37,7 @@
 // }
 
 
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import Header from './components/Header.jsx';
@@ -51,36 +51,37 @@ import About from './pages/About.jsx';
 import Admission from './pages/Admission.jsx';
 import MCQDashboard from './mcq/MCQDashboard.jsx';
 
-export default function App() {
+// ── Stable layout — defined outside App so it never remounts ──
+function Layout() {
   const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return (
+    <>
+      <Header />
+      <main>
+        <Outlet />
+      </main>
+      <Footer />
+      <AIChat />
+    </>
+  );
+}
 
+export default function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        <Route path="/*" element={
-          <>
-            <Header />
-            <main>
-              <Routes>
-                <Route path="/"         element={<Home />} />
-                <Route path="/courses"  element={<Courses />} />
-                <Route path="/practice" element={<Practice />} />
-                <Route path="/lab"      element={<div className="wrap hx-sec"><Lab /></div>} />
-                <Route path="/about"    element={<About />} />
-                <Route path="/admission" element={<Admission />} />
-                <Route path="/dashboard" element={<MCQDashboard />} />
-                <Route path="*"         element={<Home />} />
-              </Routes>
-            </main>
-            <Footer />
-            <AIChat />
-          </>
-        } />
+        <Route element={<Layout />}>
+          <Route path="/"          element={<Home />} />
+          <Route path="/courses"   element={<Courses />} />
+          <Route path="/practice"  element={<Practice />} />
+          <Route path="/lab"       element={<div className="wrap hx-sec"><Lab /></div>} />
+          <Route path="/about"     element={<About />} />
+          <Route path="/admission" element={<Admission />} />
+          <Route path="/dashboard" element={<MCQDashboard />} />
+          <Route path="*"          element={<Home />} />
+        </Route>
       </Routes>
     </ErrorBoundary>
   );
-}
+}
