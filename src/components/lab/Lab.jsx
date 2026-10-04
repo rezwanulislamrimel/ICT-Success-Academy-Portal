@@ -2,10 +2,17 @@ import { lazy, Suspense, useState } from 'react';
 import NumberLab from './NumberLab.jsx';
 import LogicLab from './LogicLab.jsx';
 import HtmlLab from './HtmlLab.jsx';
+import CLab from './CLab.jsx';
 import './lab.css';
 
 const SqlLab = lazy(() => import('./SqlLab.jsx'));
-const TABS = [['🔢', 'সংখ্যা ও কোড', NumberLab], ['🔌', 'লজিক গেট', LogicLab], ['🌐', 'HTML প্লেগ্রাউন্ড', HtmlLab], ['🗄️', 'SQL ডেটাবেজ', SqlLab]];
+const TABS = [
+  ['🔢', 'সংখ্যা ও কোড', NumberLab],
+  ['🔌', 'লজিক গেট', LogicLab],
+  ['🌐', 'HTML প্লেগ্রাউন্ড', HtmlLab],
+  ['💻', 'C প্রোগ্রামিং', CLab],
+  ['🗄️', 'SQL ডেটাবেজ', SqlLab]
+];
 
 export default function Lab() {
   const [t, setT] = useState(0); const C = TABS[t][2];
