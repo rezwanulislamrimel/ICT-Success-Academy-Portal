@@ -628,14 +628,32 @@ footer a:hover{color:var(--ink)}
 .askai{display:inline-block;margin-top:10px;font:inherit;font-weight:600;background:none;border:1px solid var(--brand);color:var(--brand);border-radius:8px;padding:6px 12px;cursor:pointer}
 .askai[hidden]{display:none}
 .tools{display:flex;gap:6px;margin-top:8px}.tools button,.chat-foot .mic{font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 9px;cursor:pointer}.chat-foot .mic{font-size:18px;padding:8px 10px;color:var(--ink)}
-footer{border-top:1px solid var(--line);margin-top:30px;padding:26px 0 34px;color:var(--muted);font-size:15px}
-footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+/* ─── FOOTER ─── */
+.site-footer { border-top: 1px solid var(--line); margin-top: 60px; color: var(--muted); font-size: 15px; }
+.footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding: 50px 20px 40px; }
+.footer-brand h3 { font-size: 20px; color: var(--ink); margin: 0 0 10px; }
+.footer-brand p { font-size: 14px; line-height: 1.6; margin: 0 0 16px; }
+.footer-socials { display: flex; gap: 12px; }
+.footer-socials a { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); transition: all 0.2s; }
+.footer-socials a:hover { border-color: var(--brand); color: var(--brand); }
+.footer-col h4 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); margin: 0 0 16px; }
+.footer-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.footer-col ul li a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+.footer-col ul li a:hover { color: var(--brand); }
+.footer-contact li { display: flex; align-items: flex-start; gap: 6px; font-size: 14px; word-break: break-all; }
+.footer-bottom { border-top: 1px solid var(--line); padding: 16px 20px; text-align: center; font-size: 13px; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--ink); }
 
 @media (max-width:860px){
   .hero,.quiz,.enroll{grid-template-columns:1fr}
   .grid3{grid-template-columns:1fr}
   .chapters{grid-template-columns:1fr}
   nav a.hide-sm{display:none}
+  .footer-main{grid-template-columns:1fr 1fr;gap:30px;padding:30px 20px}
+}
+@media (max-width:480px){
+  .footer-main{grid-template-columns:1fr;gap:24px;padding:24px 16px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 

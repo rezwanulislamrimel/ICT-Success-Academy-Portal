@@ -89,7 +89,7 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
             className="ai-link"
           >
-            AI সহায়ক ✨
+            ICT গুরু 🧑‍🏫
           </NavLink>
           <NavLink
             to="/about"

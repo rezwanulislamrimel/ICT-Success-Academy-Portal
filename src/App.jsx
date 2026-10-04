@@ -42,7 +42,6 @@ import { useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
-import AIChat from './components/AIChat.jsx';
 import Home from './pages/Home.jsx';
 import Courses from './pages/Courses.jsx';
 import Practice from './pages/Practice.jsx';
@@ -65,7 +64,6 @@ function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <AIChat />
     </>
   );
 }
