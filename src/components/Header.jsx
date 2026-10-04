@@ -89,7 +89,7 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
             className="ai-link"
           >
-            ICT গুরু 🧑‍🏫
+            ICT গুরু 🧑
           </NavLink>
           <NavLink
             to="/about"
@@ -129,10 +129,11 @@ export default function Header() {
               className="nav-profile-btn"
             >
               <span className="nav-avatar-circle">
-                {user.photo
-                  ? <img src={user.photo} alt="" className="nav-avatar-img" />
-                  : user.name.charAt(0).toUpperCase()
-                }
+                {user.photo ? (
+                  <img src={user.photo} alt="" className="nav-avatar-img" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
               </span>
               <span>{user.name.split(" ")[0]}</span>
             </Link>
