@@ -25,13 +25,34 @@
 //   );
 // }
 
-import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState(null);
+  const [isResourceOpen, setIsResourceOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const location = useLocation();
+
+  const isResourceActive = ["/lab", "/board-questions", "/cv-builder"].includes(location.pathname);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsResourceOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close dropdown when route changes
+  useEffect(() => {
+    setIsResourceOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     try {
@@ -78,9 +99,6 @@ export default function Header() {
           <NavLink to="/courses" onClick={() => setIsOpen(false)}>
             কোর্স
           </NavLink>
-          <NavLink to="/lab" onClick={() => setIsOpen(false)}>
-            ল্যাব
-          </NavLink>
           <NavLink to="/practice" onClick={() => setIsOpen(false)}>
             🎮 ফ্রি MCQ
           </NavLink>
@@ -89,29 +107,99 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
             className="ai-link"
           >
-            ICT গুরু 🧑
+            ICT গুরু 🧑‍🏫
           </NavLink>
+
+          {/* ─── রিসোর্স ড্রপডাউন ─── */}
+          <div className="nav-dropdown" ref={dropdownRef}>
+            <button
+              type="button"
+              className={`nav-dropdown-btn ${isResourceActive ? "active" : ""} ${isResourceOpen ? "open" : ""}`}
+              onClick={() => setIsResourceOpen((prev) => !prev)}
+              aria-expanded={isResourceOpen}
+              aria-haspopup="true"
+            >
+              <span>রিসোর্স</span>
+              <svg
+                className={`dropdown-chevron ${isResourceOpen ? "rotate" : ""}`}
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            {isResourceOpen && (
+              <div className="dropdown-menu-card animate-dropdown">
+                <NavLink
+                  to="/board-questions"
+                  className="dropdown-menu-item"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsResourceOpen(false);
+                  }}
+                >
+                  <div className="item-icon-box board-icon">📚</div>
+                  <div className="item-text-box">
+                    <div className="item-title">
+                      <span>বোর্ড প্রশ্ন</span>
+                      <span className="dropdown-pill yellow">২০১৮-২৬</span>
+                    </div>
+                    <div className="item-sub">SSC ও HSC সকল বোর্ড প্রশ্ন আর্কাইভ</div>
+                  </div>
+                </NavLink>
+
+                <NavLink
+                  to="/cv-builder"
+                  className="dropdown-menu-item"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsResourceOpen(false);
+                  }}
+                >
+                  <div className="item-icon-box cv-icon">📄</div>
+                  <div className="item-text-box">
+                    <div className="item-title">
+                      <span>Build CV</span>
+                      <span className="dropdown-pill green">Overleaf</span>
+                    </div>
+                    <div className="item-sub">ATS ফ্রেন্ডলি প্রফেশনাল CV তৈরি</div>
+                  </div>
+                </NavLink>
+
+                <NavLink
+                  to="/lab"
+                  className="dropdown-menu-item"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsResourceOpen(false);
+                  }}
+                >
+                  <div className="item-icon-box lab-icon">🔬</div>
+                  <div className="item-text-box">
+                    <div className="item-title">
+                      <span>ভার্চুয়াল ল্যাব</span>
+                      <span className="dropdown-pill blue">প্র্যাকটিস</span>
+                    </div>
+                    <div className="item-sub">SQL, C প্রোগ্রামিং ও লজিক গেট</div>
+                  </div>
+                </NavLink>
+              </div>
+            )}
+          </div>
+
           <NavLink
             to="/about"
             className="hide-sm"
             onClick={() => setIsOpen(false)}
           >
             কেন আমরা
-          </NavLink>
-          <NavLink
-            to="/board-questions"
-            onClick={() => setIsOpen(false)}
-            style={{ fontWeight: "600", color: "#f59e0b" }}
-          >
-            📚 বোর্ড প্রশ্ন
-          </NavLink>
-          <NavLink
-            to="/cv-builder"
-            className="cv-builder-nav-btn"
-            style={{ fontWeight: "600", color: "#16a34a" }}
-            onClick={() => setIsOpen(false)}
-          >
-            📄 Build CV
           </NavLink>
           <NavLink
             to="/admission"
@@ -245,6 +333,188 @@ export default function Header() {
         .nav-profile-btn[aria-current],
         .nav-profile-btn[aria-current="page"] {
           background: linear-gradient(135deg, #14532d, #16a34a) !important;
+        }
+
+        /* ─── RESOURCE DROPDOWN STYLING ─── */
+        .nav-dropdown {
+          position: relative;
+          display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: transparent;
+          border: none;
+          color: var(--ink);
+          font-family: inherit;
+          font-size: 15px;
+          font-weight: 600;
+          padding: 8px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .nav-dropdown-btn:hover,
+        .nav-dropdown-btn.open {
+          color: var(--brand);
+          background: rgba(16, 185, 129, 0.08);
+        }
+
+        .nav-dropdown-btn.active {
+          color: var(--brand);
+          border-bottom: 2px solid var(--accent);
+        }
+
+        .dropdown-chevron {
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dropdown-chevron.rotate {
+          transform: rotate(180deg);
+        }
+
+        /* Dropdown Card */
+        .dropdown-menu-card {
+          position: absolute;
+          top: calc(100% + 10px);
+          left: 50%;
+          transform: translateX(-50%);
+          width: 300px;
+          background: var(--surface);
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          padding: 8px;
+          box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.22);
+          backdrop-filter: blur(20px);
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .animate-dropdown {
+          animation: dropdownSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes dropdownSlideIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -8px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+
+        .dropdown-menu-item {
+          display: flex !important;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px !important;
+          border-radius: 12px !important;
+          text-decoration: none !important;
+          transition: all 0.2s ease !important;
+          border-bottom: none !important;
+          border: 1px solid transparent !important;
+        }
+
+        .dropdown-menu-item:hover {
+          background: var(--bg) !important;
+          border-color: var(--line) !important;
+          transform: translateX(3px);
+        }
+
+        .item-icon-box {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          flex-shrink: 0;
+        }
+
+        .item-icon-box.board-icon {
+          background: rgba(245, 158, 11, 0.12);
+        }
+        .item-icon-box.cv-icon {
+          background: rgba(16, 185, 129, 0.12);
+        }
+        .item-icon-box.lab-icon {
+          background: rgba(59, 130, 246, 0.12);
+        }
+
+        .item-text-box {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          flex: 1;
+        }
+
+        .item-title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 14.5px;
+          font-weight: 700;
+          color: var(--ink);
+        }
+
+        .dropdown-pill {
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 6px;
+          text-transform: uppercase;
+        }
+
+        .dropdown-pill.yellow {
+          background: rgba(245, 158, 11, 0.15);
+          color: #d97706;
+          border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .dropdown-pill.green {
+          background: rgba(16, 185, 129, 0.15);
+          color: #059669;
+          border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .dropdown-pill.blue {
+          background: rgba(59, 130, 246, 0.15);
+          color: #2563eb;
+          border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .item-sub {
+          font-size: 12px;
+          color: var(--muted);
+          line-height: 1.3;
+        }
+
+        /* Mobile Viewport adjustments */
+        @media (max-width: 860px) {
+          .nav-dropdown {
+            width: 100%;
+          }
+          .nav-dropdown-btn {
+            width: 100%;
+            justify-content: space-between;
+            padding: 10px 14px;
+            font-size: 16px;
+          }
+          .dropdown-menu-card {
+            position: static;
+            transform: none;
+            width: 100%;
+            box-shadow: none;
+            border-color: var(--line);
+            margin: 6px 0 10px 0;
+            background: rgba(0, 0, 0, 0.03);
+          }
         }
       `}</style>
     </header>
