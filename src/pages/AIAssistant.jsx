@@ -104,7 +104,8 @@ export default function AIAssistant() {
   return (
     <div className="ai-page">
       <div className="ai-page-header">
-        <h1>🧑‍🏫 ICT গুরু</h1>
+        <img src="/ict-guru-hero.jpg" alt="ICT গুরু" className="ai-hero-img" />
+        <h1>ICT গুরু</h1>
         <p>তোমার ICT-র ব্যক্তিগত শিক্ষক — টেক্সট চ্যাটে বা ভয়েসে কথা বলো!</p>
         <div className="ai-tabs">
           <button className={`ai-tab ${tab === "chat" ? "active" : ""}`} onClick={() => setTab("chat")}>
