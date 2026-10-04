@@ -110,8 +110,13 @@ export default function Header() {
             ICT গুরু 🧑‍🏫
           </NavLink>
 
-          {/* ─── রিসোর্স ড্রপডাউন ─── */}
-          <div className="nav-dropdown" ref={dropdownRef}>
+          {/* ─── রিসোর্স ড্রপডাউন (Hover & Click Support) ─── */}
+          <div
+            className={`nav-dropdown ${isResourceOpen ? "is-open" : ""}`}
+            ref={dropdownRef}
+            onMouseEnter={() => setIsResourceOpen(true)}
+            onMouseLeave={() => setIsResourceOpen(false)}
+          >
             <button
               type="button"
               className={`nav-dropdown-btn ${isResourceActive ? "active" : ""} ${isResourceOpen ? "open" : ""}`}
@@ -121,7 +126,7 @@ export default function Header() {
             >
               <span>রিসোর্স</span>
               <svg
-                className={`dropdown-chevron ${isResourceOpen ? "rotate" : ""}`}
+                className="dropdown-chevron"
                 width="12"
                 height="12"
                 viewBox="0 0 24 24"
@@ -135,63 +140,61 @@ export default function Header() {
               </svg>
             </button>
 
-            {isResourceOpen && (
-              <div className="dropdown-menu-card animate-dropdown">
-                <NavLink
-                  to="/board-questions"
-                  className="dropdown-menu-item"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setIsResourceOpen(false);
-                  }}
-                >
-                  <div className="item-icon-box board-icon">📚</div>
-                  <div className="item-text-box">
-                    <div className="item-title">
-                      <span>বোর্ড প্রশ্ন</span>
-                      <span className="dropdown-pill yellow">২০১৮-২৬</span>
-                    </div>
-                    <div className="item-sub">SSC ও HSC সকল বোর্ড প্রশ্ন আর্কাইভ</div>
+            <div className="dropdown-menu-card">
+              <NavLink
+                to="/board-questions"
+                className="dropdown-menu-item"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsResourceOpen(false);
+                }}
+              >
+                <div className="item-icon-box board-icon">📚</div>
+                <div className="item-text-box">
+                  <div className="item-title">
+                    <span>বোর্ড প্রশ্ন</span>
+                    <span className="dropdown-pill yellow">২০১৮-২৬</span>
                   </div>
-                </NavLink>
+                  <div className="item-sub">SSC ও HSC সকল বোর্ড প্রশ্ন আর্কাইভ</div>
+                </div>
+              </NavLink>
 
-                <NavLink
-                  to="/cv-builder"
-                  className="dropdown-menu-item"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setIsResourceOpen(false);
-                  }}
-                >
-                  <div className="item-icon-box cv-icon">📄</div>
-                  <div className="item-text-box">
-                    <div className="item-title">
-                      <span>Build CV</span>
-                      <span className="dropdown-pill green">Overleaf</span>
-                    </div>
-                    <div className="item-sub">ATS ফ্রেন্ডলি প্রফেশনাল CV তৈরি</div>
+              <NavLink
+                to="/cv-builder"
+                className="dropdown-menu-item"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsResourceOpen(false);
+                }}
+              >
+                <div className="item-icon-box cv-icon">📄</div>
+                <div className="item-text-box">
+                  <div className="item-title">
+                    <span>Build CV</span>
+                    <span className="dropdown-pill green">Overleaf</span>
                   </div>
-                </NavLink>
+                  <div className="item-sub">ATS ফ্রেন্ডলি প্রফেশনাল CV তৈরি</div>
+                </div>
+              </NavLink>
 
-                <NavLink
-                  to="/lab"
-                  className="dropdown-menu-item"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setIsResourceOpen(false);
-                  }}
-                >
-                  <div className="item-icon-box lab-icon">🔬</div>
-                  <div className="item-text-box">
-                    <div className="item-title">
-                      <span>ভার্চুয়াল ল্যাব</span>
-                      <span className="dropdown-pill blue">প্র্যাকটিস</span>
-                    </div>
-                    <div className="item-sub">SQL, C প্রোগ্রামিং ও লজিক গেট</div>
+              <NavLink
+                to="/lab"
+                className="dropdown-menu-item"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsResourceOpen(false);
+                }}
+              >
+                <div className="item-icon-box lab-icon">🔬</div>
+                <div className="item-text-box">
+                  <div className="item-title">
+                    <span>ভার্চুয়াল ল্যাব</span>
+                    <span className="dropdown-pill blue">প্র্যাকটিস</span>
                   </div>
-                </NavLink>
-              </div>
-            )}
+                  <div className="item-sub">SQL, C প্রোগ্রামিং ও লজিক গেট</div>
+                </div>
+              </NavLink>
+            </div>
           </div>
 
           <NavLink
@@ -357,8 +360,8 @@ export default function Header() {
           transition: all 0.2s ease;
         }
 
-        .nav-dropdown-btn:hover,
-        .nav-dropdown-btn.open {
+        .nav-dropdown:hover .nav-dropdown-btn,
+        .nav-dropdown.is-open .nav-dropdown-btn {
           color: var(--brand);
           background: rgba(16, 185, 129, 0.08);
         }
@@ -372,42 +375,53 @@ export default function Header() {
           transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .dropdown-chevron.rotate {
+        .nav-dropdown:hover .dropdown-chevron,
+        .nav-dropdown.is-open .dropdown-chevron {
           transform: rotate(180deg);
         }
 
         /* Dropdown Card */
         .dropdown-menu-card {
           position: absolute;
-          top: calc(100% + 10px);
+          top: 100%;
           left: 50%;
-          transform: translateX(-50%);
+          transform: translate(-50%, 10px);
           width: 300px;
           background: var(--surface);
           border: 1px solid var(--line);
           border-radius: 16px;
           padding: 8px;
-          box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.22);
+          box-shadow: 0 16px 45px -10px rgba(0, 0, 0, 0.25);
           backdrop-filter: blur(20px);
           z-index: 1000;
           display: flex;
           flex-direction: column;
           gap: 4px;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                      visibility 0.2s;
         }
 
-        .animate-dropdown {
-          animation: dropdownSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Invisible bridge above card so cursor doesn't lose hover */
+        .dropdown-menu-card::before {
+          content: "";
+          position: absolute;
+          top: -14px;
+          left: 0;
+          width: 100%;
+          height: 14px;
         }
 
-        @keyframes dropdownSlideIn {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -8px);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, 0);
-          }
+        /* Hover or Open state */
+        .nav-dropdown:hover .dropdown-menu-card,
+        .nav-dropdown.is-open .dropdown-menu-card {
+          opacity: 1;
+          visibility: visible;
+          pointer-events: auto;
+          transform: translate(-50%, 6px);
         }
 
         .dropdown-menu-item {
@@ -508,12 +522,22 @@ export default function Header() {
           }
           .dropdown-menu-card {
             position: static;
-            transform: none;
+            transform: none !important;
             width: 100%;
             box-shadow: none;
             border-color: var(--line);
             margin: 6px 0 10px 0;
             background: rgba(0, 0, 0, 0.03);
+            display: none;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+          }
+          .dropdown-menu-card::before {
+            display: none;
+          }
+          .nav-dropdown.is-open .dropdown-menu-card {
+            display: flex;
           }
         }
       `}</style>
