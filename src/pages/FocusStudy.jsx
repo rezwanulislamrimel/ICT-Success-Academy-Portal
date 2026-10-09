@@ -23,13 +23,38 @@ const MOTIVATIONAL_QUOTES = [
 
 // ── Demo Competitors on Leaderboard (Scores calculated in Study Points) ──
 const DEMO_LEADERBOARD = [
-  { id: "st1", name: "তানভীর হাসান", institute: "নটর ডেম কলেজ", points: 840, hours: 14.0, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st2", name: "নুসরাত জাহান", institute: "ভিকারুননিসা নূন স্কুল ও কলেজ", points: 750, hours: 12.5, badge: "💎 ডায়মন্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st3", name: "সাকিব আল হাসান", institute: "ঢাকা রেসিডেনসিয়াল মডেল কলেজ", points: 680, hours: 11.3, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st4", name: "মেহজাবিন চৌধুরী", institute: "রাজউক উত্তরা মডেল কলেজ", points: 590, hours: 9.8, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st5", name: "আরিফুল ইসলাম", institute: "দিনাজপুর সরকারি কলেজ", points: 510, hours: 8.5, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
-  { id: "st6", name: "ফারজানা আক্তার", institute: "চট্টগ্রাম কলেজ", points: 430, hours: 7.2, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
-  { id: "st7", name: "রাকিবুল করিম", institute: "সিলেট এমসি কলেজ", points: 360, hours: 6.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st1", name: "তানভীর হাসান", institute: "নটর ডেম কলেজ, ঢাকা", points: 960, hours: 16.0, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st2", name: "নুসরাত জাহান", institute: "ভিকারুননিসা নূন স্কুল ও কলেজ", points: 910, hours: 15.2, badge: "💎 ডায়মন্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st3", name: "সাকিব আল হাসান", institute: "ঢাকা রেসিডেনসিয়াল মডেল কলেজ", points: 860, hours: 14.3, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st4", name: "মেহজাবিন চৌধুরী", institute: "রাজউক উত্তরা মডেল কলেজ", points: 820, hours: 13.6, badge: "💎 ডায়মন্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st5", name: "মাহমুদুল হাসান সিয়াম", institute: "ঢাকা কলেজ", points: 780, hours: 13.0, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st6", name: "আফরিন সুলতানা", institute: "হলি ক্রস কলেজ, ঢাকা", points: 740, hours: 12.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st7", name: "আরিফুল ইসলাম", institute: "দিনাজপুর সরকারি কলেজ", points: 710, hours: 11.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st8", name: "ফারজানা আক্তার", institute: "চট্টগ্রাম কলেজ", points: 680, hours: 11.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st9", name: "রাকিবুল করিম", institute: "সিলেট এমসি কলেজ", points: 650, hours: 10.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st10", name: "নাফিসা তাসনিম", institute: "রাজশাহী কলেজ", points: 620, hours: 10.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st11", name: "তাহমিদ জামান", institute: "সেন্ট জোসেফ উচ্চ মাধ্যমিক বিদ্যালয়", points: 590, hours: 9.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
+  { id: "st12", name: "সাদিয়া ইসলাম মিলি", institute: "কুমিল্লা ভিক্টোরিয়া সরকারি কলেজ", points: 560, hours: 9.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
+  { id: "st13", name: "আব্দুল্লাহ আল নোমান", institute: "সরকারি বিজ্ঞান কলেজ, ঢাকা", points: 530, hours: 8.8, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
+  { id: "st14", name: "সুমাইয়া জাহান", institute: "আদমজী ক্যান্টনমেন্ট কলেজ", points: 500, hours: 8.3, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
+  { id: "st15", name: "রিফাত বিন আলম", institute: "বরিশাল ব্রজমোহন (বিএম) কলেজ", points: 480, hours: 8.0, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
+  { id: "st16", name: "জান্নাতুল ফেরদৌস", institute: "ময়মনসিংহ জিলা স্কুল ও কলেজ", points: 460, hours: 7.6, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
+  { id: "st17", name: "ফাহিম মুনতাসির", institute: "রংপুর সরকারি কলেজ", points: 440, hours: 7.3, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
+  { id: "st18", name: "আনিকা তাহসিন", institute: "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ", points: 420, hours: 7.0, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
+  { id: "st19", name: "জুবায়ের হোসেন", institute: "সরকারি আজিজুল হক কলেজ, বগুড়া", points: 400, hours: 6.6, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
+  { id: "st20", name: "মারিয়া হক", institute: "কুষ্টিয়া সরকারি কলেজ", points: 380, hours: 6.3, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
+  { id: "st21", name: "শাহরিয়ার নাফিস", institute: "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর", points: 360, hours: 6.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st22", name: "ইশরাত জাহান", institute: "ফেনী সরকারি কলেজ", points: 340, hours: 5.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
+  { id: "st23", name: "তৌসিফ আহমেদ", institute: "যশোর সরকারি সিটি কলেজ", points: 320, hours: 5.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st24", name: "তানিয়া সুলতানা", institute: "গাজীপুর ভাওয়াল বদরে আলম সরকারি কলেজ", points: 300, hours: 5.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
+  { id: "st25", name: "আশরাফুল ইসলাম", institute: "পাবনা এডওয়ার্ড কলেজ", points: 280, hours: 4.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st26", name: "মুনতাহা কবির", institute: "নোয়াখালী সরকারি কলেজ", points: 260, hours: 4.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
+  { id: "st27", name: "শামীম রেজা", institute: "টাঙ্গাইল সরকারি সা’দত কলেজ", points: 240, hours: 4.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st28", name: "লামিয়া চৌধুরী", institute: "সুনামগঞ্জ সরকারি কলেজ", points: 220, hours: 3.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
+  { id: "st29", name: "আবির মাহমুদ", institute: "মাদারীপুর সরকারি নাজিমউদ্দিন কলেজ", points: 200, hours: 3.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st30", name: "ফারিহা নওরীন", institute: "ব্রাহ্মণবাড়িয়া সরকারি কলেজ", points: 180, hours: 3.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
+  { id: "st31", name: "হাসান জামীল", institute: "জামালপুর সরকারি আশেক মাহমুদ কলেজ", points: 160, hours: 2.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
+  { id: "st32", name: "সাবরিনা ইয়াসমিন", institute: "পটুয়াখালী সরকারি কলেজ", points: 140, hours: 2.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
 ];
 
 export default function FocusStudy() {
@@ -84,6 +109,11 @@ export default function FocusStudy() {
   // Custom Subject Modal/Input
   const [newSubName, setNewSubName] = useState("");
   const [showAddSub, setShowAddSub] = useState(false);
+
+  // Leaderboard Filter & Search States
+  const [leagueFilter, setLeagueFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(15);
 
   // Motivational Quote Rotation
   const [quoteIndex, setQuoteIndex] = useState(0);
@@ -358,6 +388,24 @@ export default function FocusStudy() {
   ].sort((a, b) => b.points - a.points);
 
   const currentUserRank = fullLeaderboard.findIndex((item) => item.isCurrentUser) + 1;
+  const TOTAL_ACADEMY_STUDENTS = 312;
+
+  // Filtered leaderboard based on search and league
+  const filteredLeaderboard = fullLeaderboard.filter((item) => {
+    const matchesLeague =
+      leagueFilter === "all" ||
+      (leagueFilter === "diamond" && item.badge.includes("ডায়মন্ড")) ||
+      (leagueFilter === "gold" && item.badge.includes("গোল্ড")) ||
+      (leagueFilter === "silver" && item.badge.includes("সিলভার")) ||
+      (leagueFilter === "bronze" && item.badge.includes("ব্রোঞ্জ"));
+
+    const matchesSearch =
+      !searchQuery.trim() ||
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.institute.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesLeague && matchesSearch;
+  });
 
   // Day-wise distribution for Weekly Report
   const DAY_LABELS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
@@ -759,10 +807,10 @@ export default function FocusStudy() {
           <div className="fs-report-header-card">
             <div>
               <h2>🏆 শিক্ষার্থী স্টাডি লিডারবোর্ড</h2>
-              <p>কে কার চেয়ে কত পয়েন্টে এগিয়ে রয়েছে দেখে নাও (ব্যক্তিগত পড়ার সময়ের গোপনীয়তা বজায় রাখা হয়):</p>
+              <p>একাডেমির সকল শিক্ষার্থীর পড়ার ধারাবাহিকতা ও অবস্থান (ব্যক্তিগত পড়ার সময়ের গোপনীয়তা সংরক্ষিত):</p>
             </div>
             <div className="fs-my-rank-chip">
-              <span>তোমার বর্তমান অবস্থান: #{currentUserRank}</span>
+              <span>তোমার অবস্থান: #{currentUserRank} / {TOTAL_ACADEMY_STUDENTS} জন</span>
             </div>
           </div>
 
@@ -770,8 +818,85 @@ export default function FocusStudy() {
           <div className="fs-privacy-notice">
             <span className="lock-icon">🔒</span>
             <p>
-              <strong>প্রাইভেসি প্রোটেকশন:</strong> তোমার ব্যক্তিগত পড়ার নিখুঁত সময় বা ডায়েরি অন্য কেউ দেখতে পাবে না। কেবল পড়ার ধারাবাহিকতার ভিত্তিতে স্টাডি পয়েন্ট ও লিগ র‍্যাঙ্কিং প্রদর্শিত হয়।
+              <strong>প্রাইভেসি প্রোটেকশন:</strong> তোমার ব্যক্তিগত পড়ার নিখুঁত সময় বা ব্যক্তিগত ডায়েরি অন্য কেউ দেখতে পাবে না। পড়ার নিয়মিত অনুশীলনের ওপর ভিত্তি করে শুধুমাত্র স্টাডি পয়েন্ট ও লিগ র‍্যাঙ্কিং প্রদর্শিত হয়।
             </p>
+          </div>
+
+          {/* Current User Standings Card */}
+          <div className="fs-user-standings-card">
+            <div className="standings-left">
+              <span className="standings-avatar">🌟</span>
+              <div>
+                <h4 className="standings-name">{user.name || "আমার প্রোফাইল"}</h4>
+                <p className="standings-inst">{user.institute || "HSC শিক্ষার্থী"}</p>
+              </div>
+            </div>
+            <div className="standings-right">
+              <div className="standings-stat">
+                <span className="st-lbl">বর্তমান র‍্যাঙ্ক</span>
+                <span className="st-val">#{currentUserRank} তম</span>
+              </div>
+              <div className="standings-stat">
+                <span className="st-lbl">বর্তমান লিগ</span>
+                <span className="st-val league">{getUserBadge(userStudyPoints).split(" ")[0]} {getUserBadge(userStudyPoints).split(" ")[1]}</span>
+              </div>
+              <div className="standings-stat">
+                <span className="st-lbl">স্টাডি পয়েন্ট</span>
+                <span className="st-val pts">{userStudyPoints} pts</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search & League Filter Bar */}
+          <div className="fs-leaderboard-filters-card">
+            <div className="lb-search-box">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                className="lb-search-input"
+                placeholder="শিক্ষার্থীর নাম বা কলেজের নাম দিয়ে খুঁজুন..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="clear-search-btn" onClick={() => setSearchQuery("")}>
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="lb-league-chips">
+              <button
+                className={`lb-chip ${leagueFilter === "all" ? "active" : ""}`}
+                onClick={() => setLeagueFilter("all")}
+              >
+                সকল শিক্ষার্থী ({fullLeaderboard.length})
+              </button>
+              <button
+                className={`lb-chip ${leagueFilter === "diamond" ? "active" : ""}`}
+                onClick={() => setLeagueFilter("diamond")}
+              >
+                💎 ডায়মন্ড লিগ ({fullLeaderboard.filter((x) => x.badge.includes("ডায়মন্ড")).length})
+              </button>
+              <button
+                className={`lb-chip ${leagueFilter === "gold" ? "active" : ""}`}
+                onClick={() => setLeagueFilter("gold")}
+              >
+                🥇 গোল্ড লিগ ({fullLeaderboard.filter((x) => x.badge.includes("গোল্ড")).length})
+              </button>
+              <button
+                className={`lb-chip ${leagueFilter === "silver" ? "active" : ""}`}
+                onClick={() => setLeagueFilter("silver")}
+              >
+                🥈 সিলভার লিগ ({fullLeaderboard.filter((x) => x.badge.includes("সিলভার")).length})
+              </button>
+              <button
+                className={`lb-chip ${leagueFilter === "bronze" ? "active" : ""}`}
+                onClick={() => setLeagueFilter("bronze")}
+              >
+                🥉 ব্রোঞ্জ লিগ ({fullLeaderboard.filter((x) => x.badge.includes("ব্রোঞ্জ")).length})
+              </button>
+            </div>
           </div>
 
           {/* Leaderboard Table */}
@@ -788,36 +913,65 @@ export default function FocusStudy() {
                   </tr>
                 </thead>
                 <tbody>
-                  {fullLeaderboard.map((item, idx) => (
-                    <tr
-                      key={item.id}
-                      className={item.isCurrentUser ? "current-user-row" : ""}
-                    >
-                      <td>
-                        <span className={`rank-badge rank-${idx + 1}`}>
-                          {idx === 0 ? "🥇 ১" : idx === 1 ? "🥈 ২" : idx === 2 ? "🥉 ৩" : `${idx + 1}`}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="user-profile-cell">
-                          <span className="user-avatar">{item.avatar}</span>
-                          <span className="user-name">
-                            {item.name} {item.isCurrentUser && <span className="you-tag">(তুমি)</span>}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="user-inst">{item.institute}</td>
-                      <td>
-                        <span className="league-pill">{item.badge}</span>
-                      </td>
-                      <td>
-                        <span className="score-val">{item.points} pts</span>
+                  {filteredLeaderboard.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: "center", padding: "30px", color: "var(--muted)" }}>
+                        কোনো শিক্ষার্থী পাওয়া যায়নি। অন্য নাম দিয়ে সার্চ করুন।
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredLeaderboard.slice(0, visibleCount).map((item) => {
+                      const overallIndex = fullLeaderboard.findIndex((x) => x.id === item.id);
+                      return (
+                        <tr
+                          key={item.id}
+                          className={item.isCurrentUser ? "current-user-row" : ""}
+                        >
+                          <td>
+                            <span className={`rank-badge rank-${overallIndex + 1}`}>
+                              {overallIndex === 0 ? "🥇 ১" : overallIndex === 1 ? "🥈 ২" : overallIndex === 2 ? "🥉 ৩" : `${overallIndex + 1}`}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="user-profile-cell">
+                              <span className="user-avatar">{item.avatar}</span>
+                              <span className="user-name">
+                                {item.name} {item.isCurrentUser && <span className="you-tag">(তুমি)</span>}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="user-inst">{item.institute}</td>
+                          <td>
+                            <span className="league-pill">{item.badge}</span>
+                          </td>
+                          <td>
+                            <span className="score-val">{item.points} pts</span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination / Load More Controls */}
+            {filteredLeaderboard.length > visibleCount && (
+              <div className="lb-load-more-row">
+                <button
+                  className="lb-load-more-btn"
+                  onClick={() => setVisibleCount((prev) => prev + 15)}
+                >
+                  ⬇️ আরও শিক্ষার্থী দেখুন (বাকি {filteredLeaderboard.length - visibleCount} জন)
+                </button>
+                <button
+                  className="lb-show-all-btn"
+                  onClick={() => setVisibleCount(filteredLeaderboard.length)}
+                >
+                  সব শিক্ষার্থী দেখুন ({filteredLeaderboard.length} জন)
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
