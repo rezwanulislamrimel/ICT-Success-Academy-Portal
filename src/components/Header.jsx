@@ -36,7 +36,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const location = useLocation();
 
-  const isResourceActive = ["/lab", "/board-questions", "/cv-builder"].includes(location.pathname);
+  const isResourceActive = ["/lab", "/board-questions", "/cv-builder", "/focus-study"].includes(location.pathname);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -141,6 +141,24 @@ export default function Header() {
             </button>
 
             <div className="dropdown-menu-card">
+              <NavLink
+                to="/focus-study"
+                className="dropdown-menu-item"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsResourceOpen(false);
+                }}
+              >
+                <div className="item-icon-box timer-icon">⏱️</div>
+                <div className="item-text-box">
+                  <div className="item-title">
+                    <span>ফোকাস স্টাডি</span>
+                    <span className="dropdown-pill purple">নতুন লাইভ</span>
+                  </div>
+                  <div className="item-sub">বিষয়ভিত্তিক স্টাডি টাইমার ও র‍্যাঙ্কিং</div>
+                </div>
+              </NavLink>
+
               <NavLink
                 to="/board-questions"
                 className="dropdown-menu-item"
@@ -453,6 +471,9 @@ export default function Header() {
           flex-shrink: 0;
         }
 
+        .item-icon-box.timer-icon {
+          background: rgba(139, 92, 246, 0.14);
+        }
         .item-icon-box.board-icon {
           background: rgba(245, 158, 11, 0.12);
         }

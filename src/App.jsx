@@ -51,6 +51,7 @@ import Admission from './pages/Admission.jsx';
 import CVBuilder from './pages/CVBuilder.jsx';
 import BoardQuestions from './pages/BoardQuestions.jsx';
 import AIAssistant from './pages/AIAssistant.jsx';
+import FocusStudy from './pages/FocusStudy.jsx';
 import MCQDashboard from './mcq/MCQDashboard.jsx';
 
 // ── Stable layout — defined outside App so it never remounts ──
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/about"     element={<About />} />
           <Route path="/board-questions" element={<BoardQuestions />} />
           <Route path="/ai-assistant" element={<AIAssistant />} />
+          <Route path="/focus-study" element={<FocusStudy />} />
           <Route path="/admission" element={<Admission />} />
           <Route path="/cv-builder" element={<CVBuilder />} />
           <Route path="/dashboard" element={<MCQDashboard />} />
