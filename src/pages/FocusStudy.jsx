@@ -1,4 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import {
+  startAmbientSound,
+  stopAmbientSound,
+  setAmbientVolume,
+  playAlertChime,
+} from "../utils/focusAudio.js";
 import "./FocusStudy.css";
 
 // ── Default Subjects ──
@@ -56,7 +62,8 @@ export default function FocusStudy() {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [soundMode, setSoundMode] = useState("none"); // 'none' | 'rain' | 'binaural'
+  const [soundMode, setSoundMode] = useState("none"); // 'none' | 'rain' | 'binaural' | 'waves'
+  const [volume, setVolume] = useState(0.6);
 
   // Sessions History (Starts completely from ZERO — no dummy past data!)
   const [sessions, setSessions] = useState(() => {
@@ -106,7 +113,7 @@ export default function FocusStudy() {
               clearInterval(timerRef.current);
               setIsRunning(false);
               handleSessionComplete(targetMinutes);
-              playBeepAlert();
+              playAlertChime();
               return 0;
             }
             return prev - 1;
@@ -123,82 +130,27 @@ export default function FocusStudy() {
     };
   }, [isRunning, timerMode, targetMinutes]);
 
-  // Audio Ambient Synthesizer using Web Audio API (Offline & zero assets needed!)
-  const audioCtxRef = useRef(null);
-  const audioSourceRef = useRef(null);
-
-  useEffect(() => {
-    if (soundMode === "none" || !isRunning) {
-      if (audioSourceRef.current) {
-        try {
-          audioSourceRef.current.stop();
-        } catch (_) {}
-        audioSourceRef.current = null;
-      }
-      return;
+  // Ambient Sound Controller using focusAudio utility
+  const handleSelectSound = (mode) => {
+    setSoundMode(mode);
+    if (mode === "none") {
+      stopAmbientSound();
+    } else {
+      startAmbientSound(mode, volume);
     }
-
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-      const ctx = audioCtxRef.current;
-      if (ctx.state === "suspended") ctx.resume();
-
-      // Brown Noise / Rain Synthesizer Buffer
-      const bufferSize = ctx.sampleRate * 2;
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      let lastOut = 0.0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        output[i] = (lastOut + 0.02 * white) / 1.02;
-        lastOut = output[i];
-        output[i] *= 3.5;
-      }
-
-      const whiteNoise = ctx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = soundMode === "rain" ? "lowpass" : "bandpass";
-      filter.frequency.value = soundMode === "rain" ? 800 : 250;
-
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = 0.08;
-
-      whiteNoise.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      whiteNoise.start(0);
-      audioSourceRef.current = whiteNoise;
-    } catch (_) {}
-
-    return () => {
-      if (audioSourceRef.current) {
-        try {
-          audioSourceRef.current.stop();
-        } catch (_) {}
-      }
-    };
-  }, [soundMode, isRunning]);
-
-  const playBeepAlert = () => {
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 1.2);
-    } catch (_) {}
   };
+
+  const handleVolumeChange = (newVol) => {
+    setVolume(newVol);
+    setAmbientVolume(newVol);
+  };
+
+  // Cleanup sound on unmount
+  useEffect(() => {
+    return () => {
+      stopAmbientSound();
+    };
+  }, []);
 
   // Fullscreen Handler
   const toggleFullscreen = () => {
@@ -594,12 +546,29 @@ export default function FocusStudy() {
                   <select
                     className="fs-sound-select"
                     value={soundMode}
-                    onChange={(e) => setSoundMode(e.target.value)}
+                    onChange={(e) => handleSelectSound(e.target.value)}
                   >
                     <option value="none">🔇 বন্ধ</option>
-                    <option value="rain">🌧️ বৃষ্টির শব্দ (White Noise)</option>
-                    <option value="binaural">🎧 গভীর মনোযোগ (Binaural Beats)</option>
+                    <option value="rain">🌧️ বৃষ্টির শান্ত শব্দ (Rain Ambient)</option>
+                    <option value="binaural">🎧 ১০ Hz আলফা ফোকাস (Binaural Beats)</option>
+                    <option value="waves">🌊 শান্ত নদীর ঢেউ ও বাতাস (Nature Waves)</option>
                   </select>
+                  {soundMode !== "none" && (
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginLeft: "10px" }}>
+                      <span style={{ fontSize: "12px" }}>🔊</span>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="1"
+                        step="0.05"
+                        value={volume}
+                        onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                        style={{ width: "70px", accentColor: "#10b981", cursor: "pointer" }}
+                        title="সাউন্ড ভলিউম অ্যাডজাস্ট করুন"
+                      />
+                      <span style={{ fontSize: "11px", fontWeight: 700, color: "#10b981" }}>{Math.round(volume * 100)}%</span>
+                    </div>
+                  )}
                 </div>
 
                 <button

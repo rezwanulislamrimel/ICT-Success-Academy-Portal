@@ -238,6 +238,38 @@
   color: #0891b2;
 }
 
+/* Volume Control Bar */
+.hft-volume-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  border-radius: 10px;
+}
+
+.hft-vol-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.hft-vol-slider {
+  flex: 1;
+  accent-color: #10b981;
+  cursor: pointer;
+  height: 5px;
+}
+
+.hft-vol-val {
+  font-size: 12px;
+  font-weight: 800;
+  color: #10b981;
+  min-width: 34px;
+  text-align: right;
+}
+
 .hft-zen-btn {
   background: transparent;
   border: 1px solid var(--line);

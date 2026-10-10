@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import {
+  startAmbientSound,
+  stopAmbientSound,
+  setAmbientVolume,
+  playAlertChime,
+} from "../utils/focusAudio.js";
 import "./HomeFocusTimer.css";
 
 // ── Default Subjects ──
@@ -40,7 +46,8 @@ export default function HomeFocusTimer() {
   const [targetMinutes, setTargetMinutes] = useState(60);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [soundMode, setSoundMode] = useState("none"); // 'none' | 'rain' | 'binaural'
+  const [soundMode, setSoundMode] = useState("none"); // 'none' | 'rain' | 'binaural' | 'waves'
+  const [volume, setVolume] = useState(0.6);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Motivational Quote Rotation
@@ -99,7 +106,7 @@ export default function HomeFocusTimer() {
               clearInterval(timerRef.current);
               setIsRunning(false);
               handleSessionComplete(targetMinutes);
-              playBeepAlert();
+              playAlertChime();
               return 0;
             }
             return prev - 1;
@@ -116,81 +123,32 @@ export default function HomeFocusTimer() {
     };
   }, [isRunning, timerMode, targetMinutes]);
 
-  // Audio Ambient Synthesizer using Web Audio API
-  const audioCtxRef = useRef(null);
-  const audioSourceRef = useRef(null);
-
-  useEffect(() => {
-    if (soundMode === "none" || !isRunning) {
-      if (audioSourceRef.current) {
-        try {
-          audioSourceRef.current.stop();
-        } catch (_) {}
-        audioSourceRef.current = null;
+  // Ambient Sound Controller using focusAudio utility
+  const handleSelectSound = (mode) => {
+    if (soundMode === mode) {
+      setSoundMode("none");
+      stopAmbientSound();
+    } else {
+      setSoundMode(mode);
+      if (mode === "none") {
+        stopAmbientSound();
+      } else {
+        startAmbientSound(mode, volume);
       }
-      return;
     }
-
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-      const ctx = audioCtxRef.current;
-      if (ctx.state === "suspended") ctx.resume();
-
-      const bufferSize = ctx.sampleRate * 2;
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      let lastOut = 0.0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        output[i] = (lastOut + 0.02 * white) / 1.02;
-        lastOut = output[i];
-        output[i] *= 3.5;
-      }
-
-      const whiteNoise = ctx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = soundMode === "rain" ? "lowpass" : "bandpass";
-      filter.frequency.value = soundMode === "rain" ? 800 : 250;
-
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = 0.08;
-
-      whiteNoise.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      whiteNoise.start(0);
-      audioSourceRef.current = whiteNoise;
-    } catch (_) {}
-
-    return () => {
-      if (audioSourceRef.current) {
-        try {
-          audioSourceRef.current.stop();
-        } catch (_) {}
-      }
-    };
-  }, [soundMode, isRunning]);
-
-  const playBeepAlert = () => {
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 1.2);
-    } catch (_) {}
   };
+
+  const handleVolumeChange = (newVol) => {
+    setVolume(newVol);
+    setAmbientVolume(newVol);
+  };
+
+  // Cleanup sound on unmount
+  useEffect(() => {
+    return () => {
+      stopAmbientSound();
+    };
+  }, []);
 
   // Mode Switchers
   const handleSetMode = (mode) => {
@@ -389,15 +347,15 @@ export default function HomeFocusTimer() {
             <button
               type="button"
               className={`hft-snd-btn ${soundMode === "none" ? "active" : ""}`}
-              onClick={() => setSoundMode("none")}
+              onClick={() => handleSelectSound("none")}
               title="সাউন্ড বন্ধ"
             >
-              🔇 নিঃশব্দ
+              🔇 বন্ধ
             </button>
             <button
               type="button"
               className={`hft-snd-btn ${soundMode === "rain" ? "active" : ""}`}
-              onClick={() => setSoundMode("rain")}
+              onClick={() => handleSelectSound("rain")}
               title="বৃষ্টির শান্ত শব্দ"
             >
               🌧️ বৃষ্টি
@@ -405,10 +363,18 @@ export default function HomeFocusTimer() {
             <button
               type="button"
               className={`hft-snd-btn ${soundMode === "binaural" ? "active" : ""}`}
-              onClick={() => setSoundMode("binaural")}
-              title="ফোকাস বাইনোরাল টোন"
+              onClick={() => handleSelectSound("binaural")}
+              title="১০ Hz আলফা ফোকাস বাইনোরাল টোন"
             >
               🎧 ফোকাস
+            </button>
+            <button
+              type="button"
+              className={`hft-snd-btn ${soundMode === "waves" ? "active" : ""}`}
+              onClick={() => handleSelectSound("waves")}
+              title="শান্ত নদীর ঢেউ ও বাতাস"
+            >
+              🌊 ঢেউ
             </button>
           </div>
 
@@ -416,6 +382,23 @@ export default function HomeFocusTimer() {
             ⛶ ফুলস্ক্রিন জেন
           </button>
         </div>
+
+        {/* Volume Slider when sound is playing */}
+        {soundMode !== "none" && (
+          <div className="hft-volume-bar">
+            <span className="hft-vol-label">🔊 সাউন্ড ভলিউম:</span>
+            <input
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+              className="hft-vol-slider"
+            />
+            <span className="hft-vol-val">{Math.round(volume * 100)}%</span>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="hft-actions-row">
