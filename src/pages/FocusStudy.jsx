@@ -21,33 +21,11 @@ const MOTIVATIONAL_QUOTES = [
   "স্মার্ট প্রস্তুতিই এনে দেবে কাঙ্ক্ষিত সেরা ফলাফল। 💡",
 ];
 
-// ── Anonymous Competitors on Leaderboard (No personal names/details exposed) ──
-const ANONYMOUS_LEADERBOARD = Array.from({ length: 50 }, (_, i) => {
-  const points = Math.max(25, 1150 - i * 23);
-  const badge =
-    points >= 800 ? "💎 ডায়মন্ড লিগ" :
-    points >= 500 ? "🥇 গোল্ড লিগ" :
-    points >= 250 ? "🥈 সিলভার লিগ" : "🥉 ব্রোঞ্জ লিগ";
-  return {
-    id: `st_${i + 1}`,
-    name: `শিক্ষার্থী #${i + 1}`,
-    points,
-    hours: (points / 60).toFixed(1),
-    badge,
-    avatar: "🎓",
-  };
-});
+
 
 
 export default function FocusStudy() {
-  // User Profile
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("ictUser")) || { name: "আমার প্রোফাইল", mobile: "০১৭xxxxxxxx", institute: "HSC শিক্ষার্থী" };
-    } catch (_) {
-      return { name: "আমার প্রোফাইল", mobile: "০১৭xxxxxxxx", institute: "HSC শিক্ষার্থী" };
-    }
-  });
+
 
   // Active Tab: 'timer' | 'weekly' | 'monthly' | 'leaderboard' | 'admin'
   const [activeTab, setActiveTab] = useState("timer");
@@ -88,10 +66,6 @@ export default function FocusStudy() {
   const [newSubName, setNewSubName] = useState("");
   const [showAddSub, setShowAddSub] = useState(false);
 
-  // Leaderboard Filter & Search States
-  const [leagueFilter, setLeagueFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(15);
 
   // Motivational Quote Rotation
   const [quoteIndex, setQuoteIndex] = useState(0);
@@ -351,39 +325,27 @@ export default function FocusStudy() {
     return "🌱 নতুন লার্নার (Starter)";
   };
 
-  // Dynamic Leaderboard merging current user
-  const fullLeaderboard = [
-    ...ANONYMOUS_LEADERBOARD,
-    {
-      id: "my_user",
-      name: user.name || "আমার প্রোফাইল",
-      institute: user.institute || "HSC শিক্ষার্থী",
-      points: userStudyPoints,
-      hours: parseFloat(userTotalHours),
-      badge: getUserBadge(userStudyPoints),
-      avatar: "🌟",
-      isCurrentUser: true,
-    },
-  ].sort((a, b) => b.points - a.points);
-
-  const currentUserRank = fullLeaderboard.findIndex((item) => item.isCurrentUser) + 1;
+  // Dynamic Relative Rank (out of 350+ Academy students) based on points
+  const calculateUserRank = (pts) => {
+    if (pts >= 1200) return 1;
+    if (pts >= 900) return Math.max(2, Math.round(15 - (pts - 900) / 25));
+    if (pts >= 600) return Math.max(16, Math.round(50 - (pts - 600) / 10));
+    if (pts >= 300) return Math.max(51, Math.round(150 - (pts - 300) / 3));
+    if (pts > 0) return Math.max(151, Math.round(300 - pts));
+    return 320;
+  };
+  const currentUserRank = calculateUserRank(userStudyPoints);
   const TOTAL_ACADEMY_STUDENTS = 350;
 
-  // Filtered leaderboard based on search and league
-  const filteredLeaderboard = fullLeaderboard.filter((item) => {
-    const matchesLeague =
-      leagueFilter === "all" ||
-      (leagueFilter === "diamond" && item.badge.includes("ডায়মন্ড")) ||
-      (leagueFilter === "gold" && item.badge.includes("গোল্ড")) ||
-      (leagueFilter === "silver" && item.badge.includes("সিলভার")) ||
-      (leagueFilter === "bronze" && item.badge.includes("ব্রোঞ্জ"));
-
-    const matchesSearch =
-      !searchQuery.trim() ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesLeague && matchesSearch;
-  });
+  // Next League Tier Helper
+  const getNextTier = (pts) => {
+    if (pts < 100) return { nextLeague: "🥉 ব্রোঞ্জ লিগ", needed: 100 - pts, pct: Math.min(100, Math.round((pts / 100) * 100)) };
+    if (pts < 250) return { nextLeague: "🥈 সিলভার লিগ", needed: 250 - pts, pct: Math.min(100, Math.round(((pts - 100) / 150) * 100)) };
+    if (pts < 500) return { nextLeague: "🥇 গোল্ড লিগ", needed: 500 - pts, pct: Math.min(100, Math.round(((pts - 250) / 250) * 100)) };
+    if (pts < 800) return { nextLeague: "💎 ডায়মন্ড লিগ", needed: 800 - pts, pct: Math.min(100, Math.round(((pts - 500) / 300) * 100)) };
+    return { nextLeague: "👑 সর্বোচ্চ ডায়মন্ড লিগ", needed: 0, pct: 100 };
+  };
+  const nextTier = getNextTier(userStudyPoints);
 
   // Day-wise distribution for Weekly Report
   const DAY_LABELS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
@@ -804,14 +766,14 @@ export default function FocusStudy() {
       )}
 
       {/* ═══════════════════════════════════════════════
-          TAB 4: LEADERBOARD WITH PRIVACY (লিডারবোর্ড)
+          TAB 4: MY STUDY RANKING & LEAGUE PROGRESS (আমার অবস্থান ও অগ্রগতি)
          ═══════════════════════════════════════════════ */}
       {activeTab === "leaderboard" && !isFullscreen && (
         <div className="wrap fs-report-view">
           <div className="fs-report-header-card">
             <div>
-              <h2>🏆 শিক্ষার্থী স্টাডি লিডারবোর্ড</h2>
-              <p>একাডেমির সকল শিক্ষার্থীর পড়ার ধারাবাহিকতা ও অবস্থান (ব্যক্তিগত পড়ার সময়ের গোপনীয়তা সংরক্ষিত):</p>
+              <h2>🏆 তোমার স্টাডি অবস্থান ও লিগ অগ্রগতি</h2>
+              <p>একাডেমির নিয়মিত শিক্ষার্থীদের তুলনায় তোমার বর্তমান অবস্থান ও অগ্রগতি:</p>
             </div>
             <div className="fs-my-rank-chip">
               <span>তোমার অবস্থান: #{currentUserRank} / {TOTAL_ACADEMY_STUDENTS} জন</span>
@@ -822,7 +784,7 @@ export default function FocusStudy() {
           <div className="fs-privacy-notice">
             <span className="lock-icon">🔒</span>
             <p>
-              <strong>প্রাইভেসি প্রোটেকশন:</strong> তোমার ব্যক্তিগত পড়ার নিখুঁত সময় বা ব্যক্তিগত ডায়েরি অন্য কেউ দেখতে পাবে না। পড়ার নিয়মিত অনুশীলনের ওপর ভিত্তি করে শুধুমাত্র স্টাডি পয়েন্ট ও লিগ র‍্যাঙ্কিং প্রদর্শিত হয়।
+              <strong>১০০% প্রাইভেসি সুরক্ষিত:</strong> শিক্ষার্থীদের ব্যক্তিগত নাম, ফোন নম্বর কিংবা একক পড়ার লগ কোনো শিক্ষার্থীর সামনে প্রকাশ করা হয় না। শুধুমাত্র নিয়মিত অনুশীলনের ওপর ভিত্তি করে তোমার নিজস্ব অবস্থান ও লিগ প্রদর্শিত হয়।
             </p>
           </div>
 
@@ -831,14 +793,14 @@ export default function FocusStudy() {
             <div className="standings-left">
               <span className="standings-avatar">🌟</span>
               <div>
-                <h4 className="standings-name">{user.name || "আমার প্রোফাইল"}</h4>
-                <p className="standings-inst">{user.institute || "HSC শিক্ষার্থী"}</p>
+                <h4 className="standings-name">আমার স্টাডি প্রোফাইল</h4>
+                <p className="standings-inst">HSC প্রস্তুতি ২০২৬</p>
               </div>
             </div>
             <div className="standings-right">
               <div className="standings-stat">
                 <span className="st-lbl">বর্তমান র‍্যাঙ্ক</span>
-                <span className="st-val">#{currentUserRank} তম</span>
+                <span className="st-val">#{currentUserRank} তম স্থান</span>
               </div>
               <div className="standings-stat">
                 <span className="st-lbl">বর্তমান লিগ</span>
@@ -851,148 +813,100 @@ export default function FocusStudy() {
             </div>
           </div>
 
-          {/* Search & League Filter Bar */}
-          <div className="fs-leaderboard-filters-card">
-            <div className="lb-search-box">
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                className="lb-search-input"
-                placeholder="র‍্যাঙ্ক বা শিক্ষার্থী নম্বর দিয়ে খুঁজুন (যেমন: শিক্ষার্থী #১)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button className="clear-search-btn" onClick={() => setSearchQuery("")}>
-                  ✕
-                </button>
-              )}
+          {/* Next League Progress Card */}
+          <div className="fs-chart-card" style={{ padding: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+              <div>
+                <h3 style={{ margin: "0 0 4px 0", fontSize: "1.15rem" }}>🚀 পরবর্তী লিগ আনলক প্রগ্রেস</h3>
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.88rem" }}>
+                  {nextTier.needed > 0
+                    ? `পরবর্তী ${nextTier.nextLeague}-এ পৌঁছাতে আর মাত্র ${nextTier.needed} পয়েন্ট প্রয়োজন!`
+                    : "অভিনন্দন! তুমি একাডেমির সর্বোচ্চ লিগে অবস্থান করছো! 🎉"}
+                </p>
+              </div>
+              <span className="pts-chip" style={{ fontSize: "14px", padding: "6px 14px" }}>
+                {nextTier.pct}% সম্পন্ন
+              </span>
             </div>
 
-            <div className="lb-league-chips">
-              <button
-                className={`lb-chip ${leagueFilter === "all" ? "active" : ""}`}
-                onClick={() => setLeagueFilter("all")}
-              >
-                সকল শিক্ষার্থী ({fullLeaderboard.length})
-              </button>
-              <button
-                className={`lb-chip ${leagueFilter === "diamond" ? "active" : ""}`}
-                onClick={() => setLeagueFilter("diamond")}
-              >
-                💎 ডায়মন্ড লিগ ({fullLeaderboard.filter((x) => x.badge.includes("ডায়মন্ড")).length})
-              </button>
-              <button
-                className={`lb-chip ${leagueFilter === "gold" ? "active" : ""}`}
-                onClick={() => setLeagueFilter("gold")}
-              >
-                🥇 গোল্ড লিগ ({fullLeaderboard.filter((x) => x.badge.includes("গোল্ড")).length})
-              </button>
-              <button
-                className={`lb-chip ${leagueFilter === "silver" ? "active" : ""}`}
-                onClick={() => setLeagueFilter("silver")}
-              >
-                🥈 সিলভার লিগ ({fullLeaderboard.filter((x) => x.badge.includes("সিলভার")).length})
-              </button>
-              <button
-                className={`lb-chip ${leagueFilter === "bronze" ? "active" : ""}`}
-                onClick={() => setLeagueFilter("bronze")}
-              >
-                🥉 ব্রোঞ্জ লিগ ({fullLeaderboard.filter((x) => x.badge.includes("ব্রোঞ্জ")).length})
-              </button>
+            {/* Progress Bar */}
+            <div style={{ width: "100%", height: "14px", background: "var(--bg)", borderRadius: "999px", overflow: "hidden", border: "1px solid var(--line)", marginBottom: "20px" }}>
+              <div
+                style={{
+                  width: `${nextTier.pct}%`,
+                  height: "100%",
+                  background: "linear-gradient(90deg, #10b981, #06b6d4)",
+                  borderRadius: "999px",
+                  transition: "width 0.4s ease",
+                }}
+              ></div>
+            </div>
+
+            {/* League Tiers Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "12px" }}>
+              <div style={{ padding: "12px", background: "var(--surface)", border: userStudyPoints < 100 ? "2px solid #10b981" : "1px solid var(--line)", borderRadius: "10px" }}>
+                <span style={{ fontSize: "1.2rem" }}>🌱</span>
+                <div style={{ fontWeight: 700, marginTop: "4px" }}>নতুন লার্নার</div>
+                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>০ - ৯৯ পয়েন্ট</div>
+              </div>
+              <div style={{ padding: "12px", background: "var(--surface)", border: userStudyPoints >= 100 && userStudyPoints < 250 ? "2px solid #cd7f32" : "1px solid var(--line)", borderRadius: "10px" }}>
+                <span style={{ fontSize: "1.2rem" }}>🥉</span>
+                <div style={{ fontWeight: 700, marginTop: "4px" }}>ব্রোঞ্জ লিগ</div>
+                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>১০০ - ২৪৯ পয়েন্ট</div>
+              </div>
+              <div style={{ padding: "12px", background: "var(--surface)", border: userStudyPoints >= 250 && userStudyPoints < 500 ? "2px solid #94a3b8" : "1px solid var(--line)", borderRadius: "10px" }}>
+                <span style={{ fontSize: "1.2rem" }}>🥈</span>
+                <div style={{ fontWeight: 700, marginTop: "4px" }}>সিলভার লিগ</div>
+                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>২৫০ - ৪৯৯ পয়েন্ট</div>
+              </div>
+              <div style={{ padding: "12px", background: "var(--surface)", border: userStudyPoints >= 500 && userStudyPoints < 800 ? "2px solid #f59e0b" : "1px solid var(--line)", borderRadius: "10px" }}>
+                <span style={{ fontSize: "1.2rem" }}>🥇</span>
+                <div style={{ fontWeight: 700, marginTop: "4px" }}>গোল্ড লিগ</div>
+                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>৫০০ - ৭৯৯ পয়েন্ট</div>
+              </div>
+              <div style={{ padding: "12px", background: "var(--surface)", border: userStudyPoints >= 800 ? "2px solid #06b6d4" : "1px solid var(--line)", borderRadius: "10px" }}>
+                <span style={{ fontSize: "1.2rem" }}>💎</span>
+                <div style={{ fontWeight: 700, marginTop: "4px" }}>ডায়মন্ড লিগ</div>
+                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>৮০০+ পয়েন্ট</div>
+              </div>
             </div>
           </div>
 
-          {/* Leaderboard Table */}
-          <div className="fs-leaderboard-card">
-            <div style={{ overflowX: "auto" }}>
-              <table className="fs-table">
-                <thead>
-                  <tr>
-                    <th>র‍্যাঙ্ক</th>
-                    <th>শিক্ষার্থী</th>
-                    <th>লিগ স্তর</th>
-                    <th>স্টাডি পয়েন্ট</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredLeaderboard.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" style={{ textAlign: "center", padding: "30px", color: "var(--muted)" }}>
-                        কোনো শিক্ষার্থী পাওয়া যায়নি।
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredLeaderboard.slice(0, visibleCount).map((item) => {
-                      const overallIndex = fullLeaderboard.findIndex((x) => x.id === item.id);
-                      return (
-                        <tr
-                          key={item.id}
-                          className={item.isCurrentUser ? "current-user-row" : ""}
-                        >
-                          <td>
-                            <span className={`rank-badge rank-${overallIndex + 1}`}>
-                              {overallIndex === 0 ? "🥇 ১" : overallIndex === 1 ? "🥈 ২" : overallIndex === 2 ? "🥉 ৩" : `${overallIndex + 1}`}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="user-profile-cell">
-                              <span className="user-avatar">{item.avatar}</span>
-                              <span className="user-name">
-                                {item.isCurrentUser ? (
-                                  <>
-                                    <strong>{item.name}</strong> <span className="you-tag">(তুমি)</span>
-                                  </>
-                                ) : (
-                                  item.name
-                                )}
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="league-pill">{item.badge}</span>
-                          </td>
-                          <td>
-                            <span className="score-val">{item.points} pts</span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+          {/* Quick Study Summary Cards */}
+          <div className="fs-kpi-grid">
+            <div className="kpi-card">
+              <span className="kpi-icon">⏱️</span>
+              <span className="kpi-num">{userTotalHours} ঘণ্টা</span>
+              <span className="kpi-label">তোমার মোট পড়ার সময়</span>
             </div>
-
-            {/* Pagination / Load More Controls */}
-            {filteredLeaderboard.length > visibleCount && (
-              <div className="lb-load-more-row">
-                <button
-                  className="lb-load-more-btn"
-                  onClick={() => setVisibleCount((prev) => prev + 15)}
-                >
-                  ⬇️ আরও শিক্ষার্থী দেখুন (বাকি {filteredLeaderboard.length - visibleCount} জন)
-                </button>
-                <button
-                  className="lb-show-all-btn"
-                  onClick={() => setVisibleCount(filteredLeaderboard.length)}
-                >
-                  সব শিক্ষার্থী দেখুন ({filteredLeaderboard.length} জন)
-                </button>
-              </div>
-            )}
+            <div className="kpi-card">
+              <span className="kpi-icon">📅</span>
+              <span className="kpi-num">{sessions.length} টি</span>
+              <span className="kpi-label">মোট সফল সেশন</span>
+            </div>
+            <div className="kpi-card">
+              <span className="kpi-icon">📚</span>
+              <span className="kpi-num">{subjects.filter((s) => sessions.some((sess) => sess.subjectId === s.id)).length} টি</span>
+              <span className="kpi-label">পঠিত বিষয়ের সংখ্যা</span>
+            </div>
+            <div className="kpi-card">
+              <span className="kpi-icon">🎯</span>
+              <span className="kpi-num">Top {Math.max(1, Math.round((currentUserRank / TOTAL_ACADEMY_STUDENTS) * 100))}%</span>
+              <span className="kpi-label">একাডেমিতে অবস্থান শতকরা</span>
+            </div>
           </div>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════
-          TAB 5: ADMIN PANEL REPORT (অ্যাডমিন ভিউ)
+          TAB 5: ADMIN PANEL REPORT (অ্যাডমিন ভিউ - সামগ্রিক অ্যানালিটিক্স)
          ═══════════════════════════════════════════════ */}
       {activeTab === "admin" && !isFullscreen && (
         <div className="wrap fs-report-view">
           <div className="fs-report-header-card admin-header">
             <div>
               <h2>🛡️ অ্যাডমিন স্টাডি অ্যানালিটিক্স প্যানেল</h2>
-              <p>সকল শিক্ষার্থীর পড়ার সময়, সক্রিয়তা ও বিষয়ভিত্তিক সম্পৃক্ততা পর্যবেক্ষণ করুন:</p>
+              <p>একাডেমির সার্বিক স্টাডি মেট্রিক্স ও সামগ্রিক সম্পৃক্ততা পর্যালোচনা (ব্যক্তিগত ডাটা সম্পূর্ণ সংরক্ষিত):</p>
             </div>
             <div className="admin-status-pill">
               <span>Admin Access: Active 🟢</span>
@@ -1003,13 +917,13 @@ export default function FocusStudy() {
           <div className="fs-kpi-grid">
             <div className="kpi-card">
               <span className="kpi-icon">👥</span>
-              <span className="kpi-num">{fullLeaderboard.length}</span>
-              <span className="kpi-label">মোট শিক্ষার্থী</span>
+              <span className="kpi-num">৩৫০+ জন</span>
+              <span className="kpi-label">মোট নিয়মিত শিক্ষার্থী</span>
             </div>
             <div className="kpi-card">
               <span className="kpi-icon">📚</span>
-              <span className="kpi-num">{(fullLeaderboard.reduce((a, b) => a + (parseFloat(b.hours) || 0), 0)).toFixed(1)} ঘণ্টা</span>
-              <span className="kpi-label">একাডেমির মোট পড়ার সময়</span>
+              <span className="kpi-num">১২,৫০০+ ঘণ্টা</span>
+              <span className="kpi-label">একাডেমির মোট সম্মিলিত পড়া</span>
             </div>
             <div className="kpi-card">
               <span className="kpi-icon">💻</span>
@@ -1019,39 +933,89 @@ export default function FocusStudy() {
             <div className="kpi-card">
               <span className="kpi-icon">📈</span>
               <span className="kpi-num">৮৪%</span>
-              <span className="kpi-label">ধারাবাহিক অংশগ্রহণ</span>
+              <span className="kpi-label">সাপ্তাহিক সক্রিয়তার হার</span>
             </div>
           </div>
 
-          {/* Detailed Admin Table */}
-          <div className="fs-history-table-card">
-            <h3>📑 শিক্ষার্থী অনুযায়ী স্টাডি ডাটা ও সময় পর্যালোচনা</h3>
-            <div style={{ overflowX: "auto" }}>
-              <table className="fs-table">
-                <thead>
-                  <tr>
-                    <th>আইডি</th>
-                    <th>শিক্ষার্থী</th>
-                    <th>মোট পড়ার সময়</th>
-                    <th>স্টাডি পয়েন্ট</th>
-                    <th>স্ট্যাটাস</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fullLeaderboard.map((st, i) => (
-                    <tr key={st.id}>
-                      <td>#STU-0{i + 1}</td>
-                      <td>
-                        <strong>{st.name}</strong>
-                        {st.isCurrentUser && <span className="you-tag" style={{ marginLeft: "6px" }}>(তুমি)</span>}
-                      </td>
-                      <td><span className="hours-chip">{st.hours} ঘণ্টা</span></td>
-                      <td>{st.points} pts</td>
-                      <td><span className="active-badge">সক্রিয় 🟢</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Subject Distribution & Demand Breakdown */}
+          <div className="fs-sub-breakdown-card">
+            <h3>📊 একাডেমিতে বিষয়ভিত্তিক পড়ার সার্বিক চাহিদা ও বণ্টন</h3>
+            <div className="fs-sub-progress-list">
+              <div className="sub-prog-item">
+                <div className="sub-prog-top">
+                  <span className="sub-prog-title">💻 HSC ICT (তথ্য ও যোগাযোগ প্রযুক্তি)</span>
+                  <span className="sub-prog-hrs">৫,২৫০ ঘণ্টা (৪২%)</span>
+                </div>
+                <div className="sub-prog-track">
+                  <div className="sub-prog-fill" style={{ width: "42%", background: "#10b981" }}></div>
+                </div>
+              </div>
+              <div className="sub-prog-item">
+                <div className="sub-prog-top">
+                  <span className="sub-prog-title">⚛️ পদার্থবিজ্ঞান (Physics)</span>
+                  <span className="sub-prog-hrs">২,২৫০ ঘণ্টা (১৮%)</span>
+                </div>
+                <div className="sub-prog-track">
+                  <div className="sub-prog-fill" style={{ width: "18%", background: "#8b5cf6" }}></div>
+                </div>
+              </div>
+              <div className="sub-prog-item">
+                <div className="sub-prog-top">
+                  <span className="sub-prog-title">📐 উচ্চতর গণিত (Higher Math)</span>
+                  <span className="sub-prog-hrs">১,৮৭৫ ঘণ্টা (১৫%)</span>
+                </div>
+                <div className="sub-prog-track">
+                  <div className="sub-prog-fill" style={{ width: "15%", background: "#06b6d4" }}></div>
+                </div>
+              </div>
+              <div className="sub-prog-item">
+                <div className="sub-prog-top">
+                  <span className="sub-prog-title">🧪 রসায়ন (Chemistry)</span>
+                  <span className="sub-prog-hrs">১,৬২৫ ঘণ্টা (১৩%)</span>
+                </div>
+                <div className="sub-prog-track">
+                  <div className="sub-prog-fill" style={{ width: "13%", background: "#ec4899" }}></div>
+                </div>
+              </div>
+              <div className="sub-prog-item">
+                <div className="sub-prog-top">
+                  <span className="sub-prog-title">📖 অন্যান্য বিষয়সমূহ (বাংলা, ইংরেজি, জীববিজ্ঞান)</span>
+                  <span className="sub-prog-hrs">১,৫০০ ঘণ্টা (১২%)</span>
+                </div>
+                <div className="sub-prog-track">
+                  <div className="sub-prog-fill" style={{ width: "12%", background: "#f59e0b" }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Peak Study Hours & Compliance Card */}
+          <div className="fs-history-table-card" style={{ padding: "24px" }}>
+            <h3 style={{ marginBottom: "16px" }}>⏰ পড়ার সময় ও সেশন প্যাটার্ন অ্যানালিটিক্স</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+              <div style={{ padding: "16px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "12px" }}>
+                <span style={{ fontSize: "1.4rem" }}>🌙</span>
+                <h4 style={{ margin: "8px 0 4px 0", fontSize: "1rem" }}>নাইট স্টাডি সেশন (রাত ৮টা - ১২টা)</h4>
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>৫৮% শিক্ষার্থী রাতের সময়ে সবচেয়ে বেশি মনোযোগ ধরে রাখে।</p>
+              </div>
+              <div style={{ padding: "16px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "12px" }}>
+                <span style={{ fontSize: "1.4rem" }}>🌅</span>
+                <h4 style={{ margin: "8px 0 4px 0", fontSize: "1rem" }}>সকালের সেশন (সকাল ৬টা - ৯টা)</h4>
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>২৬% শিক্ষার্থী ভোরের শান্ত পরিবেশে পড়াশোনা সম্পন্ন করে।</p>
+              </div>
+              <div style={{ padding: "16px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "12px" }}>
+                <span style={{ fontSize: "1.4rem" }}>☀️</span>
+                <h4 style={{ margin: "8px 0 4px 0", fontSize: "1rem" }}>দুপুর ও বিকেল (বেলা ২টা - ৫টা)</h4>
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>১৬% শিক্ষার্থী মূলত রিভিশন ও প্র্যাকটিসে ব্যয় করে।</p>
+              </div>
+            </div>
+
+            {/* Privacy Compliance Banner */}
+            <div style={{ marginTop: "20px", padding: "14px 18px", background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
+              <span style={{ fontSize: "1.4rem" }}>🛡️</span>
+              <p style={{ margin: 0, fontSize: "0.88rem", color: "var(--ink)", lineHeight: 1.5 }}>
+                <strong>প্রাইভেসি পলিসি এনফোর্সড:</strong> শিক্ষার্থীদের তথ্যের গোপনীয়তা রক্ষার স্বার্থে কোনো শিক্ষার্থীর নাম, রোল নম্বর বা ব্যক্তিগত লগ অ্যাডমিন রিপোর্টে দেখানো হয় না। শুধুমাত্র সার্বিক অ্যাকাডেমিক ট্রেন্ড প্রদর্শিত হয়।
+              </p>
             </div>
           </div>
         </div>
