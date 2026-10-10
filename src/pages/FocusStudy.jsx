@@ -21,41 +21,23 @@ const MOTIVATIONAL_QUOTES = [
   "স্মার্ট প্রস্তুতিই এনে দেবে কাঙ্ক্ষিত সেরা ফলাফল। 💡",
 ];
 
-// ── Demo Competitors on Leaderboard (Scores calculated in Study Points) ──
-const DEMO_LEADERBOARD = [
-  { id: "st1", name: "তানভীর হাসান", institute: "নটর ডেম কলেজ, ঢাকা", points: 960, hours: 16.0, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st2", name: "নুসরাত জাহান", institute: "ভিকারুননিসা নূন স্কুল ও কলেজ", points: 910, hours: 15.2, badge: "💎 ডায়মন্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st3", name: "সাকিব আল হাসান", institute: "ঢাকা রেসিডেনসিয়াল মডেল কলেজ", points: 860, hours: 14.3, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st4", name: "মেহজাবিন চৌধুরী", institute: "রাজউক উত্তরা মডেল কলেজ", points: 820, hours: 13.6, badge: "💎 ডায়মন্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st5", name: "মাহমুদুল হাসান সিয়াম", institute: "ঢাকা কলেজ", points: 780, hours: 13.0, badge: "💎 ডায়মন্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st6", name: "আফরিন সুলতানা", institute: "হলি ক্রস কলেজ, ঢাকা", points: 740, hours: 12.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st7", name: "আরিফুল ইসলাম", institute: "দিনাজপুর সরকারি কলেজ", points: 710, hours: 11.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st8", name: "ফারজানা আক্তার", institute: "চট্টগ্রাম কলেজ", points: 680, hours: 11.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st9", name: "রাকিবুল করিম", institute: "সিলেট এমসি কলেজ", points: 650, hours: 10.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st10", name: "নাফিসা তাসনিম", institute: "রাজশাহী কলেজ", points: 620, hours: 10.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st11", name: "তাহমিদ জামান", institute: "সেন্ট জোসেফ উচ্চ মাধ্যমিক বিদ্যালয়", points: 590, hours: 9.8, badge: "🥇 গোল্ড লিগ", avatar: "👨‍🎓" },
-  { id: "st12", name: "সাদিয়া ইসলাম মিলি", institute: "কুমিল্লা ভিক্টোরিয়া সরকারি কলেজ", points: 560, hours: 9.3, badge: "🥇 গোল্ড লিগ", avatar: "👩‍🎓" },
-  { id: "st13", name: "আব্দুল্লাহ আল নোমান", institute: "সরকারি বিজ্ঞান কলেজ, ঢাকা", points: 530, hours: 8.8, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
-  { id: "st14", name: "সুমাইয়া জাহান", institute: "আদমজী ক্যান্টনমেন্ট কলেজ", points: 500, hours: 8.3, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
-  { id: "st15", name: "রিফাত বিন আলম", institute: "বরিশাল ব্রজমোহন (বিএম) কলেজ", points: 480, hours: 8.0, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
-  { id: "st16", name: "জান্নাতুল ফেরদৌস", institute: "ময়মনসিংহ জিলা স্কুল ও কলেজ", points: 460, hours: 7.6, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
-  { id: "st17", name: "ফাহিম মুনতাসির", institute: "রংপুর সরকারি কলেজ", points: 440, hours: 7.3, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
-  { id: "st18", name: "আনিকা তাহসিন", institute: "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ", points: 420, hours: 7.0, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
-  { id: "st19", name: "জুবায়ের হোসেন", institute: "সরকারি আজিজুল হক কলেজ, বগুড়া", points: 400, hours: 6.6, badge: "🥈 সিলভার লিগ", avatar: "👨‍🎓" },
-  { id: "st20", name: "মারিয়া হক", institute: "কুষ্টিয়া সরকারি কলেজ", points: 380, hours: 6.3, badge: "🥈 সিলভার লিগ", avatar: "👩‍🎓" },
-  { id: "st21", name: "শাহরিয়ার নাফিস", institute: "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর", points: 360, hours: 6.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st22", name: "ইশরাত জাহান", institute: "ফেনী সরকারি কলেজ", points: 340, hours: 5.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-  { id: "st23", name: "তৌসিফ আহমেদ", institute: "যশোর সরকারি সিটি কলেজ", points: 320, hours: 5.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st24", name: "তানিয়া সুলতানা", institute: "গাজীপুর ভাওয়াল বদরে আলম সরকারি কলেজ", points: 300, hours: 5.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-  { id: "st25", name: "আশরাফুল ইসলাম", institute: "পাবনা এডওয়ার্ড কলেজ", points: 280, hours: 4.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st26", name: "মুনতাহা কবির", institute: "নোয়াখালী সরকারি কলেজ", points: 260, hours: 4.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-  { id: "st27", name: "শামীম রেজা", institute: "টাঙ্গাইল সরকারি সা’দত কলেজ", points: 240, hours: 4.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st28", name: "লামিয়া চৌধুরী", institute: "সুনামগঞ্জ সরকারি কলেজ", points: 220, hours: 3.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-  { id: "st29", name: "আবির মাহমুদ", institute: "মাদারীপুর সরকারি নাজিমউদ্দিন কলেজ", points: 200, hours: 3.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st30", name: "ফারিহা নওরীন", institute: "ব্রাহ্মণবাড়িয়া সরকারি কলেজ", points: 180, hours: 3.0, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-  { id: "st31", name: "হাসান জামীল", institute: "জামালপুর সরকারি আশেক মাহমুদ কলেজ", points: 160, hours: 2.6, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👨‍🎓" },
-  { id: "st32", name: "সাবরিনা ইয়াসমিন", institute: "পটুয়াখালী সরকারি কলেজ", points: 140, hours: 2.3, badge: "🥉 ব্রোঞ্জ লিগ", avatar: "👩‍🎓" },
-];
+// ── Anonymous Competitors on Leaderboard (No personal names/details exposed) ──
+const ANONYMOUS_LEADERBOARD = Array.from({ length: 50 }, (_, i) => {
+  const points = Math.max(25, 1150 - i * 23);
+  const badge =
+    points >= 800 ? "💎 ডায়মন্ড লিগ" :
+    points >= 500 ? "🥇 গোল্ড লিগ" :
+    points >= 250 ? "🥈 সিলভার লিগ" : "🥉 ব্রোঞ্জ লিগ";
+  return {
+    id: `st_${i + 1}`,
+    name: `শিক্ষার্থী #${i + 1}`,
+    points,
+    hours: (points / 60).toFixed(1),
+    badge,
+    avatar: "🎓",
+  };
+});
+
 
 export default function FocusStudy() {
   // User Profile
@@ -87,20 +69,16 @@ export default function FocusStudy() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundMode, setSoundMode] = useState("none"); // 'none' | 'rain' | 'binaural'
 
-  // Sessions History
+  // Sessions History (Starts completely from ZERO — no dummy past data!)
   const [sessions, setSessions] = useState(() => {
     try {
       const saved = localStorage.getItem("ict_focus_sessions");
-      if (saved) return JSON.parse(saved);
-      // Demo Initial Past Sessions for Instant Visual Delight
-      const now = new Date();
-      return [
-        { id: "s1", subjectId: "ict", minutes: 90, date: new Date(now.getTime() - 86400000 * 1).toISOString(), timestamp: Date.now() - 86400000 * 1 },
-        { id: "s2", subjectId: "physics", minutes: 60, date: new Date(now.getTime() - 86400000 * 2).toISOString(), timestamp: Date.now() - 86400000 * 2 },
-        { id: "s3", subjectId: "math", minutes: 120, date: new Date(now.getTime() - 86400000 * 3).toISOString(), timestamp: Date.now() - 86400000 * 3 },
-        { id: "s4", subjectId: "english", minutes: 45, date: new Date(now.getTime() - 86400000 * 4).toISOString(), timestamp: Date.now() - 86400000 * 4 },
-        { id: "s5", subjectId: "ict", minutes: 80, date: new Date(now.getTime() - 86400000 * 5).toISOString(), timestamp: Date.now() - 86400000 * 5 },
-      ];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only keep genuine user sessions (IDs starting with s_)
+        return parsed.filter((s) => s.id && s.id.startsWith("s_"));
+      }
+      return [];
     } catch (_) {
       return [];
     }
@@ -369,12 +347,13 @@ export default function FocusStudy() {
     if (pts >= 800) return "💎 ডায়মন্ড লিগ (Top Tier)";
     if (pts >= 500) return "🥇 গোল্ড লিগ (Advanced)";
     if (pts >= 250) return "🥈 সিলভার লিগ (Pro)";
-    return "🥉 ব্রোঞ্জ লিগ (Active)";
+    if (pts > 0) return "🥉 ব্রোঞ্জ লিগ (Active)";
+    return "🌱 নতুন লার্নার (Starter)";
   };
 
   // Dynamic Leaderboard merging current user
   const fullLeaderboard = [
-    ...DEMO_LEADERBOARD,
+    ...ANONYMOUS_LEADERBOARD,
     {
       id: "my_user",
       name: user.name || "আমার প্রোফাইল",
@@ -388,7 +367,7 @@ export default function FocusStudy() {
   ].sort((a, b) => b.points - a.points);
 
   const currentUserRank = fullLeaderboard.findIndex((item) => item.isCurrentUser) + 1;
-  const TOTAL_ACADEMY_STUDENTS = 312;
+  const TOTAL_ACADEMY_STUDENTS = 350;
 
   // Filtered leaderboard based on search and league
   const filteredLeaderboard = fullLeaderboard.filter((item) => {
@@ -401,8 +380,7 @@ export default function FocusStudy() {
 
     const matchesSearch =
       !searchQuery.trim() ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.institute.toLowerCase().includes(searchQuery.toLowerCase());
+      item.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesLeague && matchesSearch;
   });
@@ -669,6 +647,11 @@ export default function FocusStudy() {
           {/* Bar Chart Representation */}
           <div className="fs-chart-card">
             <h3>📅 দিনভিত্তিক পড়ার সময় (ঘণ্টা/মিনিট)</h3>
+            {weeklySessions.length === 0 && (
+              <div style={{ textAlign: "center", padding: "12px", background: "rgba(59, 130, 246, 0.05)", borderRadius: "8px", marginBottom: "16px", color: "var(--muted)", fontSize: "0.88rem" }}>
+                💡 চলতি সপ্তাহে এখনও কোনো পড়ার সেশন সম্পন্ন হয়নি। টাইমার দিয়ে পড়া শুরু করলেই এখানে দিনভিত্তিক বার গ্রাফ দৃশ্যমান হবে।
+              </div>
+            )}
             <div className="fs-bar-chart">
               {DAY_LABELS.map((dayLabel, idx) => {
                 const mins = weeklyDayMinutes[idx];
@@ -753,13 +736,24 @@ export default function FocusStudy() {
           {/* Grade / Tier Performance Banner (like quiz score) */}
           <div className="fs-grade-banner">
             <div className="grade-badge-circle">
-              {userStudyPoints >= 600 ? "A+" : userStudyPoints >= 400 ? "A" : "B+"}
+              {userStudyPoints >= 600 ? "A+" : userStudyPoints >= 400 ? "A" : userStudyPoints > 0 ? "B+" : "🌱"}
             </div>
             <div className="grade-info">
-              <h3>তোমার মাসিক স্টাডি গ্রেড: {userStudyPoints >= 600 ? "A+ (অসাধারণ নিয়মানুবর্তিতা)" : "A (চমৎকার অগ্রগতি)"}</h3>
-              <p>
-                তুমি নিয়মিত পড়াশোনা করছো! প্রতিদিন মাত্র ৩০ মিনিট বেশি সময় দিলে তুমি পরবর্তী লিগে শীর্ষ স্থান অধিকার করতে পারবে।
-              </p>
+              {userStudyPoints === 0 ? (
+                <>
+                  <h3>তোমার মাসিক স্টাডি গ্রেড: নতুন লার্নার (এখনো শুরু করা হয়নি)</h3>
+                  <p>
+                    টাইমার চালু করে তোমার প্রথম পড়ার সেশনটি সম্পন্ন করো। পড়া শেষ করলেই সাথে সাথে তোমার পারফরম্যান্স গ্রেড, পয়েন্ট ও ধারাবাহিকতা রেটিং দৃশ্যমান হবে!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3>তোমার মাসিক স্টাডি গ্রেড: {userStudyPoints >= 600 ? "A+ (অসাধারণ নিয়মানুবর্তিতা)" : userStudyPoints >= 400 ? "A (চমৎকার অগ্রগতি)" : "B+ (ভালো চেষ্টা)"}</h3>
+                  <p>
+                    তুমি নিয়মিত পড়াশোনা করছো! প্রতিদিন মাত্র ৩০ মিনিট বেশি সময় দিলে তুমি পরবর্তী লিগে শীর্ষ স্থান অধিকার করতে পারবে।
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -777,21 +771,31 @@ export default function FocusStudy() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sessions.slice(0, 10).map((s) => {
-                    const sub = subjects.find((sb) => sb.id === s.subjectId) || { name: "বিষয়", icon: "📖" };
-                    return (
-                      <tr key={s.id}>
-                        <td>{new Date(s.timestamp).toLocaleDateString("bn-BD")}</td>
-                        <td>
-                          <span className="table-sub-tag">
-                            {sub.icon} {sub.name}
-                          </span>
-                        </td>
-                        <td><strong>{s.minutes} মিনিট</strong></td>
-                        <td><span className="pts-chip">+{Math.round(s.minutes * 1.5)} pts</span></td>
-                      </tr>
-                    );
-                  })}
+                  {sessions.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: "center", padding: "35px 20px", color: "var(--muted)" }}>
+                        <div style={{ fontSize: "2.2rem", marginBottom: "8px" }}>⏱️</div>
+                        <p style={{ fontWeight: 600, color: "var(--text)", marginBottom: "4px" }}>এখনো কোনো পড়ার সেশন সম্পন্ন হয়নি</p>
+                        <p style={{ fontSize: "0.88rem" }}>ওপরের <strong>স্টাডি টাইমার</strong> চালিয়ে পড়া শুরু করো, তোমার পড়া নিখুঁতভাবে রেকর্ড হতে থাকবে!</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    sessions.slice(0, 10).map((s) => {
+                      const sub = subjects.find((sb) => sb.id === s.subjectId) || { name: "বিষয়", icon: "📖" };
+                      return (
+                        <tr key={s.id}>
+                          <td>{new Date(s.timestamp).toLocaleDateString("bn-BD")}</td>
+                          <td>
+                            <span className="table-sub-tag">
+                              {sub.icon} {sub.name}
+                            </span>
+                          </td>
+                          <td><strong>{s.minutes} মিনিট</strong></td>
+                          <td><span className="pts-chip">+{Math.round(s.minutes * 1.5)} pts</span></td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -854,7 +858,7 @@ export default function FocusStudy() {
               <input
                 type="text"
                 className="lb-search-input"
-                placeholder="শিক্ষার্থীর নাম বা কলেজের নাম দিয়ে খুঁজুন..."
+                placeholder="র‍্যাঙ্ক বা শিক্ষার্থী নম্বর দিয়ে খুঁজুন (যেমন: শিক্ষার্থী #১)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -906,8 +910,7 @@ export default function FocusStudy() {
                 <thead>
                   <tr>
                     <th>র‍্যাঙ্ক</th>
-                    <th>শিক্ষার্থীর নাম</th>
-                    <th>প্রতিষ্ঠান</th>
+                    <th>শিক্ষার্থী</th>
                     <th>লিগ স্তর</th>
                     <th>স্টাডি পয়েন্ট</th>
                   </tr>
@@ -915,8 +918,8 @@ export default function FocusStudy() {
                 <tbody>
                   {filteredLeaderboard.length === 0 ? (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: "center", padding: "30px", color: "var(--muted)" }}>
-                        কোনো শিক্ষার্থী পাওয়া যায়নি। অন্য নাম দিয়ে সার্চ করুন।
+                      <td colSpan="4" style={{ textAlign: "center", padding: "30px", color: "var(--muted)" }}>
+                        কোনো শিক্ষার্থী পাওয়া যায়নি।
                       </td>
                     </tr>
                   ) : (
@@ -936,11 +939,16 @@ export default function FocusStudy() {
                             <div className="user-profile-cell">
                               <span className="user-avatar">{item.avatar}</span>
                               <span className="user-name">
-                                {item.name} {item.isCurrentUser && <span className="you-tag">(তুমি)</span>}
+                                {item.isCurrentUser ? (
+                                  <>
+                                    <strong>{item.name}</strong> <span className="you-tag">(তুমি)</span>
+                                  </>
+                                ) : (
+                                  item.name
+                                )}
                               </span>
                             </div>
                           </td>
-                          <td className="user-inst">{item.institute}</td>
                           <td>
                             <span className="league-pill">{item.badge}</span>
                           </td>
@@ -1000,7 +1008,7 @@ export default function FocusStudy() {
             </div>
             <div className="kpi-card">
               <span className="kpi-icon">📚</span>
-              <span className="kpi-num">{(fullLeaderboard.reduce((a, b) => a + b.hours, 0)).toFixed(1)} ঘণ্টা</span>
+              <span className="kpi-num">{(fullLeaderboard.reduce((a, b) => a + (parseFloat(b.hours) || 0), 0)).toFixed(1)} ঘণ্টা</span>
               <span className="kpi-label">একাডেমির মোট পড়ার সময়</span>
             </div>
             <div className="kpi-card">
@@ -1023,8 +1031,7 @@ export default function FocusStudy() {
                 <thead>
                   <tr>
                     <th>আইডি</th>
-                    <th>শিক্ষার্থীর নাম</th>
-                    <th>কলেজ / প্রতিষ্ঠান</th>
+                    <th>শিক্ষার্থী</th>
                     <th>মোট পড়ার সময়</th>
                     <th>স্টাডি পয়েন্ট</th>
                     <th>স্ট্যাটাস</th>
@@ -1034,8 +1041,10 @@ export default function FocusStudy() {
                   {fullLeaderboard.map((st, i) => (
                     <tr key={st.id}>
                       <td>#STU-0{i + 1}</td>
-                      <td><strong>{st.name}</strong></td>
-                      <td>{st.institute}</td>
+                      <td>
+                        <strong>{st.name}</strong>
+                        {st.isCurrentUser && <span className="you-tag" style={{ marginLeft: "6px" }}>(তুমি)</span>}
+                      </td>
                       <td><span className="hours-chip">{st.hours} ঘণ্টা</span></td>
                       <td>{st.points} pts</td>
                       <td><span className="active-badge">সক্রিয় 🟢</span></td>
