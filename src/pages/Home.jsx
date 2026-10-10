@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Converter from '../components/Converter.jsx';
 import Lab from '../components/lab/Lab.jsx';
+import HomeFocusTimer from '../components/HomeFocusTimer.jsx';
 import { LEVELS } from '../data.js';
 import '../home.css';
 
@@ -61,7 +62,12 @@ export default function Home() {
               <Link className="btn primary" to="/admission">এখনই ভর্তি হও →</Link>
               <Link className="btn ghost" to="/courses" style={{ color: '#fff', borderColor: 'rgba(255,255,255,.6)' }}>কোর্স দেখো</Link>
             </div>
-            <div className="hx-chips"><span>✔ চ্যাপ্টারভিত্তিক</span><span>✔ AI সহায়ক</span><Link to="/practice" style={{ color: 'inherit' }}><span>🎮 ফ্রি MCQ গেম</span></Link></div>
+            <div className="hx-chips">
+              <span>✔ চ্যাপ্টারভিত্তিক</span>
+              <span>✔ AI সহায়ক</span>
+              <Link to="/practice" style={{ color: 'inherit' }}><span>🎮 ফ্রি MCQ গেম</span></Link>
+              <Link to="/focus-study" style={{ color: 'inherit' }}><span>⏱️ ফোকাস স্টাডি</span></Link>
+            </div>
           </div>
           <Converter />
         </div>
@@ -77,6 +83,12 @@ export default function Home() {
       <Reveal className="hx-sec">
         <h2>ICT ল্যাব — নিজে করে শেখো</h2><p className="sub">সংখ্যা পদ্ধতি, কোড, লজিক গেট, HTML ও SQL — সব এক জায়গায়, সাথে সাথে ফলাফল।</p>
         <Lab />
+      </Reveal>
+
+      <Reveal className="hx-sec">
+        <h2>⏱️ লাইভ ফোকাস স্টাডি জোন</h2>
+        <p className="sub">পড়ার সময় ট্র্যাক করো, মনোযোগ বাড়াও এবং একাডেমি লিডারবোর্ডে এগিয়ে থাকো।</p>
+        <HomeFocusTimer />
       </Reveal>
 
       <Reveal className="hx-sec">
