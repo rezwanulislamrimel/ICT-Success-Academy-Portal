@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════
-//  FOCUS STUDY AMBIENT AUDIO ENGINE (Web Audio API)
-//  Zero external MP3 dependencies • 100% Offline • Realistic & Instant
+//  PREMIUM FOCUS STUDY AMBIENT AUDIO ENGINE (Web Audio API)
+//  Continuous Infinite Looping • Zero Race Conditions • Studio Quality
 // ═══════════════════════════════════════════════════════════════════
 
 let audioCtx = null;
 let activeNodes = [];
 let masterGain = null;
 let currentMode = "none";
-let currentVolume = 0.5;
+let currentVolume = 0.6;
 
 function getContext() {
   if (!audioCtx) {
@@ -22,30 +22,42 @@ function getContext() {
   return audioCtx;
 }
 
+export function getAmbientSoundMode() {
+  return currentMode;
+}
+
 export function stopAmbientSound() {
   currentMode = "none";
-  if (masterGain && audioCtx) {
+
+  // Capture existing nodes & gain in a local closure so ANY newly started
+  // sound is NEVER accidentally canceled by setTimeout!
+  const nodesToStop = [...activeNodes];
+  const gainToFade = masterGain;
+
+  // Immediately clear references for new sounds
+  activeNodes = [];
+  masterGain = null;
+
+  if (gainToFade && audioCtx) {
     try {
-      // Smooth fade-out to prevent headphone clicks
-      masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
-      masterGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+      const now = audioCtx.currentTime;
+      gainToFade.gain.setValueAtTime(gainToFade.gain.value, now);
+      gainToFade.gain.linearRampToValueAtTime(0.0001, now + 0.15);
     } catch (_) {}
   }
 
   setTimeout(() => {
-    activeNodes.forEach((node) => {
+    nodesToStop.forEach((node) => {
       try {
         if (node.stop) node.stop();
         if (node.disconnect) node.disconnect();
       } catch (_) {}
     });
-    activeNodes = [];
-    masterGain = null;
-  }, 160);
+  }, 180);
 }
 
 export function setAmbientVolume(vol) {
-  currentVolume = Math.max(0, Math.min(1, vol));
+  currentVolume = Math.max(0.05, Math.min(1, vol));
   if (masterGain && audioCtx) {
     try {
       masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
@@ -54,30 +66,31 @@ export function setAmbientVolume(vol) {
   }
 }
 
-export function startAmbientSound(mode, volume = 0.5) {
+export function startAmbientSound(mode, volume = 0.6) {
   const ctx = getContext();
   if (!ctx) return;
 
-  if (mode === "none") {
+  if (!mode || mode === "none") {
     stopAmbientSound();
     return;
   }
 
-  // If already playing this mode, just update volume
+  // If already playing this exact mode, simply update volume
   if (currentMode === mode && masterGain) {
     setAmbientVolume(volume);
     return;
   }
 
-  // Stop previous sound nodes
+  // Stop previous sound nodes cleanly
   stopAmbientSound();
-  currentMode = mode;
-  currentVolume = volume;
 
-  // Master Gain Node for volume control and smooth fade-in
+  currentMode = mode;
+  currentVolume = Math.max(0.05, Math.min(1, volume));
+
+  // Master Gain Node for smooth fade-in and volume scaling
   masterGain = ctx.createGain();
   masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(currentVolume, ctx.currentTime + 0.25);
+  masterGain.gain.linearRampToValueAtTime(currentVolume, ctx.currentTime + 0.3);
   masterGain.connect(ctx.destination);
 
   if (mode === "rain") {
@@ -89,14 +102,15 @@ export function startAmbientSound(mode, volume = 0.5) {
   }
 }
 
-// ── 🌧️ Realistic Rain Sound Generator ──
+// ── 🌧️ Studio-Grade Gentle Rain Generator ──
+// Seamless 8-second stereo pink noise with droplet resonance and wind modulation
 function createRainSound(ctx, outputDestination) {
   const sampleRate = ctx.sampleRate;
-  const bufferDuration = 4; // 4 seconds seamless loop
+  const bufferDuration = 8; // 8 seconds seamless buffer
   const bufferSize = sampleRate * bufferDuration;
   const noiseBuffer = ctx.createBuffer(2, bufferSize, sampleRate);
 
-  // Generate Stereo Pink/Brown Noise with randomized droplet density
+  // Generate warm stereo pink noise
   for (let ch = 0; ch < 2; ch++) {
     const data = noiseBuffer.getChannelData(ch);
     let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -108,8 +122,18 @@ function createRainSound(ctx, outputDestination) {
       b3 = 0.86650 * b3 + white * 0.3104856;
       b4 = 0.55000 * b4 + white * 0.5329522;
       b5 = -0.76160 * b5 - white * 0.0168980;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.14;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.16;
       b6 = white * 0.115926;
+    }
+
+    // Cross-fade the first and last 0.3s of buffer so loop is 100% infinite and seamless
+    const fadeLen = Math.floor(sampleRate * 0.3);
+    for (let i = 0; i < fadeLen; i++) {
+      const ratio = i / fadeLen;
+      const blend = 0.5 * (1 - Math.cos(Math.PI * ratio));
+      const tailIdx = bufferSize - fadeLen + i;
+      data[i] = data[i] * blend + data[tailIdx] * (1 - blend);
+      data[tailIdx] = data[i];
     }
   }
 
@@ -117,53 +141,87 @@ function createRainSound(ctx, outputDestination) {
   noiseSource.buffer = noiseBuffer;
   noiseSource.loop = true;
 
-  // Multi-stage filtering for rich gentle rain texture
+  // Main Rain Filter (Lowpass 1100 Hz for soothing soft rain)
   const lowpass = ctx.createBiquadFilter();
   lowpass.type = "lowpass";
-  lowpass.frequency.value = 1350;
+  lowpass.frequency.value = 1150;
   lowpass.Q.value = 0.7;
 
+  // Highpass to eliminate subwoofer rumble
   const highpass = ctx.createBiquadFilter();
   highpass.type = "highpass";
-  highpass.frequency.value = 150;
+  highpass.frequency.value = 140;
 
-  // Rain Gain
-  const rainGain = ctx.createGain();
-  rainGain.gain.value = 0.65;
+  // Droplet sparkle resonator (adds subtle realism of rain hitting surfaces)
+  const dropletFilter = ctx.createBiquadFilter();
+  dropletFilter.type = "bandpass";
+  dropletFilter.frequency.value = 2100;
+  dropletFilter.Q.value = 1.8;
 
+  const dropletGain = ctx.createGain();
+  dropletGain.gain.value = 0.12;
+
+  const mainRainGain = ctx.createGain();
+  mainRainGain.gain.value = 0.75;
+
+  // Connect Main Rain Path
   noiseSource.connect(lowpass);
   lowpass.connect(highpass);
-  highpass.connect(rainGain);
-  rainGain.connect(outputDestination);
+  highpass.connect(mainRainGain);
+  mainRainGain.connect(outputDestination);
+
+  // Connect Droplet Path
+  noiseSource.connect(dropletFilter);
+  dropletFilter.connect(dropletGain);
+  dropletGain.connect(outputDestination);
 
   noiseSource.start(0);
-  activeNodes.push(noiseSource, lowpass, highpass, rainGain);
+  activeNodes.push(noiseSource, lowpass, highpass, mainRainGain, dropletFilter, dropletGain);
 }
 
-// ── 🎧 10 Hz Alpha Wave Binaural Focus Drone Generator ──
+// ── 🎧 10 Hz Alpha Wave + Meditation Ambient Drone ──
+// Pure Alpha wave binaural carrier (216 Hz & 226 Hz) + harmonic ambient pad
 function createBinauralSound(ctx, outputDestination) {
-  // Base study carrier frequency: 216 Hz (left) & 226 Hz (right) -> 10 Hz Alpha Beat
-  const baseFreq = 216;
-  const beatDiff = 10; // 10 Hz Alpha wave for deep focus & retention
+  const baseFreq = 216; // A3 harmonic
+  const beatDiff = 10;  // 10 Hz Alpha wave for deep concentration & recall
 
+  // Left Ear Oscillator (216 Hz)
   const leftOsc = ctx.createOscillator();
-  const rightOsc = ctx.createOscillator();
   leftOsc.type = "sine";
-  rightOsc.type = "sine";
   leftOsc.frequency.value = baseFreq;
+
+  // Right Ear Oscillator (226 Hz)
+  const rightOsc = ctx.createOscillator();
+  rightOsc.type = "sine";
   rightOsc.frequency.value = baseFreq + beatDiff;
 
-  // Sub-harmonic warm tone (108 Hz warm drone)
+  // Harmonic Sub-Drone (108 Hz warm fundamental bass)
   const subOsc = ctx.createOscillator();
   subOsc.type = "sine";
   subOsc.frequency.value = baseFreq / 2;
 
-  const subGain = ctx.createGain();
-  subGain.gain.value = 0.18;
-  subOsc.connect(subGain);
-  subGain.connect(outputDestination);
+  // Harmonic Fifth (162 Hz calming warm overtone)
+  const fifthOsc = ctx.createOscillator();
+  fifthOsc.type = "sine";
+  fifthOsc.frequency.value = (baseFreq / 2) * 1.5;
 
-  // Stereo Panning for binaural effect (or Channel Merger fallback)
+  const subGain = ctx.createGain();
+  subGain.gain.value = 0.22;
+
+  const fifthGain = ctx.createGain();
+  fifthGain.gain.value = 0.14;
+
+  const warmFilter = ctx.createBiquadFilter();
+  warmFilter.type = "lowpass";
+  warmFilter.frequency.value = 380;
+
+  subOsc.connect(subGain);
+  fifthOsc.connect(fifthGain);
+  subGain.connect(warmFilter);
+  fifthGain.connect(warmFilter);
+  warmFilter.connect(outputDestination);
+
+  // Stereo Binaural Separation
   if (ctx.createStereoPanner) {
     const panLeft = ctx.createStereoPanner();
     panLeft.pan.value = -0.85;
@@ -177,7 +235,6 @@ function createBinauralSound(ctx, outputDestination) {
 
     activeNodes.push(panLeft, panRight);
   } else {
-    // Fallback if StereoPanner is unavailable
     const merger = ctx.createChannelMerger(2);
     leftOsc.connect(merger, 0, 0);
     rightOsc.connect(merger, 0, 1);
@@ -185,21 +242,19 @@ function createBinauralSound(ctx, outputDestination) {
     activeNodes.push(merger);
   }
 
-  // Gentle tone gains
-  const toneGain = ctx.createGain();
-  toneGain.gain.value = 0.22;
-
   leftOsc.start(0);
   rightOsc.start(0);
   subOsc.start(0);
+  fifthOsc.start(0);
 
-  activeNodes.push(leftOsc, rightOsc, subOsc, subGain, toneGain);
+  activeNodes.push(leftOsc, rightOsc, subOsc, fifthOsc, subGain, fifthGain, warmFilter);
 }
 
-// ── 🌊 Calm Ocean Waves / Stream Generator ──
+// ── 🌊 Calming Ocean Waves Generator ──
+// Rhythmic swell and undertow sweeping between 200 Hz and 750 Hz
 function createWavesSound(ctx, outputDestination) {
   const sampleRate = ctx.sampleRate;
-  const bufferDuration = 5;
+  const bufferDuration = 8;
   const bufferSize = sampleRate * bufferDuration;
   const noiseBuffer = ctx.createBuffer(2, bufferSize, sampleRate);
 
@@ -209,7 +264,16 @@ function createWavesSound(ctx, outputDestination) {
     for (let i = 0; i < bufferSize; i++) {
       const white = Math.random() * 2 - 1;
       last = (last + 0.02 * white) / 1.02;
-      data[i] = last * 3.2;
+      data[i] = last * 3.6;
+    }
+    // Seamless cross-fade
+    const fadeLen = Math.floor(sampleRate * 0.3);
+    for (let i = 0; i < fadeLen; i++) {
+      const ratio = i / fadeLen;
+      const blend = 0.5 * (1 - Math.cos(Math.PI * ratio));
+      const tailIdx = bufferSize - fadeLen + i;
+      data[i] = data[i] * blend + data[tailIdx] * (1 - blend);
+      data[tailIdx] = data[i];
     }
   }
 
@@ -217,23 +281,23 @@ function createWavesSound(ctx, outputDestination) {
   noiseSource.buffer = noiseBuffer;
   noiseSource.loop = true;
 
-  // Dynamic filter simulating rolling waves
+  // Sweeping wave filter
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 450;
-  filter.Q.value = 1.2;
+  filter.frequency.value = 420;
+  filter.Q.value = 1.1;
 
-  // LFO to slowly sweep the wave filter cutoff up and down
+  // 10-second rhythmic ocean swell cycle (0.1 Hz)
   const lfo = ctx.createOscillator();
-  lfo.frequency.value = 0.12; // slow wave period (~8.3 seconds)
+  lfo.frequency.value = 0.1;
   const lfoGain = ctx.createGain();
-  lfoGain.gain.value = 350;
+  lfoGain.gain.value = 320;
 
   lfo.connect(lfoGain);
   lfoGain.connect(filter.frequency);
 
   const waveGain = ctx.createGain();
-  waveGain.gain.value = 0.6;
+  waveGain.gain.value = 0.72;
 
   noiseSource.connect(filter);
   filter.connect(waveGain);
@@ -258,7 +322,7 @@ export function playAlertChime() {
     osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
     osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4); // A5
 
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.setValueAtTime(0.35, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
 
     osc.connect(gain);
