@@ -366,6 +366,32 @@ export default function FocusStudy() {
   };
   const nextTier = getNextTier(userStudyPoints);
 
+  // Student Study Records for Admin (Strictly Hours & Grade only — no personal names/details)
+  const userGradeObj =
+    userStudyPoints >= 600 ? { grade: "A+", bg: "#dcfce7", color: "#16a34a" } :
+    userStudyPoints >= 400 ? { grade: "A", bg: "#d1fae5", color: "#059669" } :
+    userStudyPoints >= 200 ? { grade: "B+", bg: "#dbeafe", color: "#2563eb" } :
+    userStudyPoints > 0 ? { grade: "B", bg: "#e0e7ff", color: "#4f46e5" } :
+    { grade: "স্টার্টার 🌱", bg: "#fee2e2", color: "#dc2626" };
+
+  const ADMIN_STUDY_RECORDS = [
+    { id: "#STU-01", hours: "১৮.৫", grade: "A+", badgeBg: "#dcfce7", badgeColor: "#16a34a" },
+    { id: "#STU-02", hours: "১৬.২", grade: "A+", badgeBg: "#dcfce7", badgeColor: "#16a34a" },
+    { id: "#STU-03", hours: "১৫.০", grade: "A+", badgeBg: "#dcfce7", badgeColor: "#16a34a" },
+    { id: "#STU-04", hours: "১৩.৮", grade: "A",  badgeBg: "#d1fae5", badgeColor: "#059669" },
+    { id: "#STU-05", hours: "১২.৫", grade: "A",  badgeBg: "#d1fae5", badgeColor: "#059669" },
+    { id: "#STU-06", hours: "১১.০", grade: "A",  badgeBg: "#d1fae5", badgeColor: "#059669" },
+    { id: "#STU-07", hours: "৯.৫",  grade: "B+", badgeBg: "#dbeafe", badgeColor: "#2563eb" },
+    { id: "#STU-08", hours: "৮.২",  grade: "B+", badgeBg: "#dbeafe", badgeColor: "#2563eb" },
+    { id: "#STU-09", hours: "৭.০",  grade: "B+", badgeBg: "#dbeafe", badgeColor: "#2563eb" },
+    { id: "#STU-10", hours: "৫.৫",  grade: "B",  badgeBg: "#e0e7ff", badgeColor: "#4f46e5" },
+    { id: "#STU-11", hours: "৪.২",  grade: "B",  badgeBg: "#e0e7ff", badgeColor: "#4f46e5" },
+    { id: `#STU-${currentUserRank < 10 ? "0" + currentUserRank : currentUserRank}`, hours: userTotalHours, grade: userGradeObj.grade, badgeBg: userGradeObj.bg, badgeColor: userGradeObj.color, isUser: true },
+    { id: "#STU-15", hours: "৩.০",  grade: "B",  badgeBg: "#e0e7ff", badgeColor: "#4f46e5" },
+    { id: "#STU-16", hours: "২.২",  grade: "B",  badgeBg: "#e0e7ff", badgeColor: "#4f46e5" },
+  ].sort((a, b) => parseFloat(b.hours) - parseFloat(a.hours));
+
+
   // Day-wise distribution for Weekly Report
   const DAY_LABELS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
   const weeklyDayMinutes = [0, 0, 0, 0, 0, 0, 0];
@@ -424,6 +450,32 @@ export default function FocusStudy() {
               >
                 🔄
               </button>
+            </div>
+
+            {/* 🏆 Quick Standing KPI Cards (Admin-style) - Visible Immediately on Entry */}
+            <div className="fs-kpi-grid" style={{ marginBottom: "26px" }}>
+              <div className="kpi-card" style={{ border: "2px solid rgba(245, 158, 11, 0.4)", background: "rgba(245, 158, 11, 0.06)" }}>
+                <span className="kpi-icon">🏆</span>
+                <span className="kpi-num" style={{ color: "#d97706" }}>#{currentUserRank} তম</span>
+                <span className="kpi-label">বর্তমান লিডারবোর্ড র‍্যাঙ্ক</span>
+              </div>
+              <div className="kpi-card" style={{ border: "2px solid rgba(16, 185, 129, 0.4)", background: "rgba(16, 185, 129, 0.06)" }}>
+                <span className="kpi-icon">⏳</span>
+                <span className="kpi-num" style={{ color: "#10b981" }}>{userTotalHours} ঘণ্টা</span>
+                <span className="kpi-label">তোমার মোট পড়ার সময়</span>
+              </div>
+              <div className="kpi-card" style={{ border: "2px solid rgba(6, 182, 212, 0.4)", background: "rgba(6, 182, 212, 0.06)" }}>
+                <span className="kpi-icon">🎯</span>
+                <span className="kpi-num" style={{ color: "#0891b2" }}>{userStudyPoints} pts</span>
+                <span className="kpi-label">মোট অর্জিত পয়েন্ট</span>
+              </div>
+              <div className="kpi-card" style={{ border: "2px solid rgba(139, 92, 246, 0.4)", background: "rgba(139, 92, 246, 0.06)" }}>
+                <span className="kpi-icon">⭐</span>
+                <span className="kpi-num" style={{ color: "#7c3aed", fontSize: "1.35rem" }}>
+                  {getUserBadge(userStudyPoints).split(" ")[0]} {getUserBadge(userStudyPoints).split(" ")[1]}
+                </span>
+                <span className="kpi-label">বর্তমান লিগ স্তর</span>
+              </div>
             </div>
 
             {/* Navigation Tabs */}
@@ -822,28 +874,29 @@ export default function FocusStudy() {
             </p>
           </div>
 
-          {/* Current User Standings Card */}
-          <div className="fs-user-standings-card">
-            <div className="standings-left">
-              <span className="standings-avatar">🌟</span>
-              <div>
-                <h4 className="standings-name">আমার স্টাডি প্রোফাইল</h4>
-                <p className="standings-inst">HSC প্রস্তুতি ২০২৬</p>
-              </div>
+          {/* Admin-Style User Standings KPI Grid */}
+          <div className="fs-kpi-grid" style={{ marginBottom: "24px" }}>
+            <div className="kpi-card" style={{ border: "2px solid rgba(245, 158, 11, 0.4)", background: "rgba(245, 158, 11, 0.06)" }}>
+              <span className="kpi-icon">🏆</span>
+              <span className="kpi-num" style={{ color: "#d97706" }}>#{currentUserRank} তম</span>
+              <span className="kpi-label">একাডেমিতে অবস্থান ({TOTAL_ACADEMY_STUDENTS} জনের মধ্যে)</span>
             </div>
-            <div className="standings-right">
-              <div className="standings-stat">
-                <span className="st-lbl">বর্তমান র‍্যাঙ্ক</span>
-                <span className="st-val">#{currentUserRank} তম স্থান</span>
-              </div>
-              <div className="standings-stat">
-                <span className="st-lbl">বর্তমান লিগ</span>
-                <span className="st-val league">{getUserBadge(userStudyPoints).split(" ")[0]} {getUserBadge(userStudyPoints).split(" ")[1]}</span>
-              </div>
-              <div className="standings-stat">
-                <span className="st-lbl">স্টাডি পয়েন্ট</span>
-                <span className="st-val pts">{userStudyPoints} pts</span>
-              </div>
+            <div className="kpi-card" style={{ border: "2px solid rgba(16, 185, 129, 0.4)", background: "rgba(16, 185, 129, 0.06)" }}>
+              <span className="kpi-icon">⏳</span>
+              <span className="kpi-num" style={{ color: "#10b981" }}>{userTotalHours} ঘণ্টা</span>
+              <span className="kpi-label">মোট পড়ার সময়</span>
+            </div>
+            <div className="kpi-card" style={{ border: "2px solid rgba(6, 182, 212, 0.4)", background: "rgba(6, 182, 212, 0.06)" }}>
+              <span className="kpi-icon">🎯</span>
+              <span className="kpi-num" style={{ color: "#0891b2" }}>{userStudyPoints} pts</span>
+              <span className="kpi-label">মোট অর্জিত পয়েন্ট</span>
+            </div>
+            <div className="kpi-card" style={{ border: "2px solid rgba(139, 92, 246, 0.4)", background: "rgba(139, 92, 246, 0.06)" }}>
+              <span className="kpi-icon">⭐</span>
+              <span className="kpi-num" style={{ color: "#7c3aed", fontSize: "1.35rem" }}>
+                {getUserBadge(userStudyPoints).split(" ")[0]} {getUserBadge(userStudyPoints).split(" ")[1]}
+              </span>
+              <span className="kpi-label">বর্তমান লিগ স্তর</span>
             </div>
           </div>
 
@@ -968,6 +1021,62 @@ export default function FocusStudy() {
               <span className="kpi-icon">📈</span>
               <span className="kpi-num">৮৪%</span>
               <span className="kpi-label">সাপ্তাহিক সক্রিয়তার হার</span>
+            </div>
+          </div>
+
+          {/* Admin Students Study Hours & Grades Table (Strictly Hours & Grade only) */}
+          <div className="fs-history-table-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: "1.15rem" }}>📋 শিক্ষার্থীভিত্তিক পড়ার সময় ও গ্রেড রেকর্ড</h3>
+                <p style={{ margin: "4px 0 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>
+                  ব্যক্তিগত নাম ও তথ্যবিহীন শতভাগ সুরক্ষিত রিপোর্ট — শুধুমাত্র পড়ার সময় ও অর্জিত গ্রেড
+                </p>
+              </div>
+              <span className="pts-chip" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981", fontSize: "13px", padding: "6px 14px" }}>
+                🔒 শিক্ষার্থী আইডি ভিত্তিক (Anonymous)
+              </span>
+            </div>
+
+            <div style={{ overflowX: "auto" }}>
+              <table className="fs-table">
+                <thead>
+                  <tr>
+                    <th>শিক্ষার্থী আইডি</th>
+                    <th>পড়ার সময় (Hours)</th>
+                    <th>অর্জিত গ্রেড (Grade)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ADMIN_STUDY_RECORDS.map((item, idx) => (
+                    <tr key={idx} className={item.isUser ? "current-user-row" : ""}>
+                      <td>
+                        <strong style={{ color: item.isUser ? "#10b981" : "inherit" }}>
+                          {item.id} {item.isUser && " ⭐ (তুমি)"}
+                        </strong>
+                      </td>
+                      <td>
+                        <strong style={{ fontSize: "1.05rem" }}>{item.hours} ঘণ্টা</strong>
+                      </td>
+                      <td>
+                        <span
+                          style={{
+                            padding: "4px 14px",
+                            borderRadius: "999px",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            background: item.badgeBg,
+                            color: item.badgeColor,
+                            display: "inline-block",
+                          }}
+                        >
+                          {item.grade}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 

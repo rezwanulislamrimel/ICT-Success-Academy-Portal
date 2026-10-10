@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import "./MCQDashboard.css";
 
 // ─────────────────────────────────────────────
@@ -14,6 +15,25 @@ const DEMO_EXAMS = [
 
 const OVERALL_RANK   = 5;
 const TOTAL_STUDENTS = 312;
+
+const STUDY_SUBJECTS = [
+  { id: "ict", name: "HSC ICT (তথ্য ও যোগাযোগ প্রযুক্তি)", icon: "💻", color: "#10b981" },
+  { id: "bangla", name: "বাংলা (Bangla)", icon: "📖", color: "#f59e0b" },
+  { id: "english", name: "ইংরেজি (English)", icon: "🇬🇧", color: "#3b82f6" },
+  { id: "physics", name: "পদার্থবিজ্ঞান (Physics)", icon: "⚛️", color: "#8b5cf6" },
+  { id: "chemistry", name: "রসায়ন (Chemistry)", icon: "🧪", color: "#ec4899" },
+  { id: "math", name: "উচ্চতর গণিত (Higher Math)", icon: "📐", color: "#06b6d4" },
+  { id: "biology", name: "জীববিজ্ঞান (Biology)", icon: "🧬", color: "#14b8a6" },
+];
+
+function getStudyGrade(mins) {
+  const pts = Math.round(mins * 1.5);
+  if (pts >= 600) return { grade: "A+", label: "অসাধারণ নিয়মানুবর্তিতা", desc: "তোমার পড়ার ধারাবাহিকতা শীর্ষ স্তরের!", bg: "#dcfce7", color: "#16a34a", bar: "linear-gradient(90deg, #16a34a, #4ade80)", pct: 100 };
+  if (pts >= 400) return { grade: "A", label: "চমৎকার অগ্রগতি", desc: "তুমি খুব নিয়মিতভাবে পড়াশোনা চালিয়ে যাচ্ছো।", bg: "#d1fae5", color: "#059669", bar: "linear-gradient(90deg, #059669, #6ee7b7)", pct: 80 };
+  if (pts >= 200) return { grade: "B+", label: "ভালো চেষ্টা", desc: "ভালো অগ্রগতি! প্রতিদিন আরেকটু সময় দিলে A+ নিশ্চিত।", bg: "#dbeafe", color: "#2563eb", bar: "linear-gradient(90deg, #2563eb, #93c5fd)", pct: 60 };
+  if (pts > 0) return { grade: "B", label: "সন্তোষজনক শুরু", desc: "পড়া শুরু হয়েছে! প্রতিদিন নির্ধারিত লক্ষ্য পূরণ করো।", bg: "#e0e7ff", color: "#4f46e5", bar: "linear-gradient(90deg, #4f46e5, #a5b4fc)", pct: 40 };
+  return { grade: "🌱 স্টার্টার", label: "এখনো শুরু হয়নি", desc: "টাইমার চালু করে তোমার প্রথম পড়ার সেশনটি শুরু করো!", bg: "#fee2e2", color: "#dc2626", bar: "linear-gradient(90deg, #f87171, #fca5a5)", pct: 10 };
+}
 // ─────────────────────────────────────────────
 
 // ── Helpers ───────────────────────────────────
@@ -159,6 +179,7 @@ function LoginPage({ onLogin }) {
 //  DASHBOARD PAGE
 // ════════════════════════════════════════════
 function Dashboard({ user, onLogout, onUpdateUser }) {
+  const [activeDashTab, setActiveDashTab] = useState("quiz"); // 'quiz' | 'study'
   const [rankBarW, setRankBarW] = useState(0);
   const [perfBarW, setPerfBarW] = useState(0);
 
@@ -166,6 +187,36 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ ...user });
   const editFileRef = useRef(null);
+
+  // Focus Study Data from localStorage
+  const [studySessions] = useState(() => {
+    try {
+      const saved = localStorage.getItem("ict_focus_sessions");
+      if (saved) {
+        return JSON.parse(saved).filter((s) => s.id && s.id.startsWith("s_"));
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  });
+
+  const totalStudyMinutes = studySessions.reduce((acc, s) => acc + (s.minutes || 0), 0);
+  const totalStudyHours = (totalStudyMinutes / 60).toFixed(1);
+  const studyPoints = Math.round(totalStudyMinutes * 1.5);
+  const studyGrade = getStudyGrade(totalStudyMinutes);
+
+  const studySubBreakdown = STUDY_SUBJECTS.map((sub) => {
+    const subMins = studySessions
+      .filter((s) => s.subjectId === sub.id)
+      .reduce((acc, s) => acc + (s.minutes || 0), 0);
+    return {
+      ...sub,
+      hours: (subMins / 60).toFixed(1),
+      minutes: subMins,
+      pct: totalStudyMinutes > 0 ? Math.round((subMins / totalStudyMinutes) * 100) : 0,
+    };
+  });
 
   const totalExams    = DEMO_EXAMS.length;
   const totalMarks    = DEMO_EXAMS.reduce((s, e) => s + e.obtained, 0);
@@ -227,6 +278,7 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
     setIsEditing(false);
   };
 
+
   return (
     <div className="mcqd-dash-page">
       {/* ── Content ── */}
@@ -241,13 +293,178 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
           <span className="mcqd-greeting-badge">{badgeText}</span>
         </div>
 
-        {/* Top row: Profile + Rank */}
-        <div className="mcqd-top-row">
-          {/* Profile */}
-          <div className="mcqd-profile-card">
-            
-            {!isEditing ? (
-              <>
+        {/* Navigation Tabs: MCQ Quiz vs Focus Study */}
+        <div className="mcqd-tabs-bar">
+          <button
+            type="button"
+            className={`mcqd-tab-btn ${activeDashTab === "quiz" ? "active" : ""}`}
+            onClick={() => setActiveDashTab("quiz")}
+          >
+            📝 MCQ কুইজ ড্যাশবোর্ড
+          </button>
+          <button
+            type="button"
+            className={`mcqd-tab-btn ${activeDashTab === "study" ? "active" : ""}`}
+            onClick={() => setActiveDashTab("study")}
+          >
+            ⏱️ ফোকাস স্টাডি ট্র্যাকার ({totalStudyHours} ঘণ্টা)
+          </button>
+        </div>
+
+        {/* ── TAB 1: MCQ QUIZ VIEW ── */}
+        {activeDashTab === "quiz" && (
+          <>
+            {/* Top row: Profile + Rank */}
+            <div className="mcqd-top-row">
+              {/* Profile */}
+              <div className="mcqd-profile-card">
+                {!isEditing ? (
+                  <>
+                    <div className="mcqd-profile-avatar-wrap">
+                      <div className="mcqd-profile-avatar">
+                        <Avatar photo={user.photo} name={user.name} />
+                      </div>
+                      <div className="mcqd-online-dot">✓</div>
+                    </div>
+                    <p className="mcqd-profile-name">{user.name}</p>
+                    <p className="mcqd-profile-inst">{user.institute}</p>
+                    <div className="mcqd-profile-tags">
+                      <span className="mcqd-tag">📱 {user.mobile}</span>
+                      {user.email && <span className="mcqd-tag">✉ {user.email}</span>}
+                    </div>
+                  </>
+                ) : (
+                  <form onSubmit={saveEdit} className="mcqd-edit-form">
+                    <div className="mcqd-edit-avatar-picker" onClick={() => editFileRef.current.click()}>
+                      <div className="mcqd-profile-avatar">
+                        <Avatar photo={editData.photo} name={editData.name} />
+                      </div>
+                      <div className="mcqd-edit-avatar-overlay">📷</div>
+                    </div>
+                    <input ref={editFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEditPhoto} />
+                    
+                    <input id="name" value={editData.name} onChange={handleEditChange} className="mcqd-input" placeholder="আপনার নাম" required />
+                    <input id="mobile" value={editData.mobile} onChange={handleEditChange} className="mcqd-input" placeholder="মোবাইল নম্বর" type="tel" maxLength={11} required />
+                    <input id="institute" value={editData.institute} onChange={handleEditChange} className="mcqd-input" placeholder="প্রতিষ্ঠানের নাম" required />
+                    <input id="email" value={editData.email} onChange={handleEditChange} className="mcqd-input" placeholder="ইমেইল (ঐচ্ছিক)" type="email" />
+                    
+                    <div className="mcqd-edit-actions">
+                      <button type="submit" className="mcqd-btn-save">সেভ করুন</button>
+                      <button type="button" onClick={cancelEdit} className="mcqd-btn-cancel">বাতিল</button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
+              {/* Rank */}
+              <div className="mcqd-rank-card">
+                <p className="mcqd-rank-card-title">🏆 সামগ্রিক কুইজ র‍্যাংক</p>
+                <div className="mcqd-rank-num-row">
+                  <span className="mcqd-rank-num">{OVERALL_RANK}</span>
+                  <span className="mcqd-rank-suffix">তম</span>
+                </div>
+                <p className="mcqd-rank-total">মোট {TOTAL_STUDENTS} জন শিক্ষার্থীর মধ্যে</p>
+                <div className="mcqd-rank-perc-box">
+                  <p className="mcqd-rank-perc-label">শীর্ষ শতাংশ</p>
+                  <div className="mcqd-bar-bg">
+                    <div className="mcqd-rank-bar-fill" style={{ width: `${rankBarW}%` }} />
+                  </div>
+                  <p className="mcqd-rank-perc-val">শীর্ষ {100 - rankPct}% শিক্ষার্থীর মধ্যে আছেন</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="mcqd-stats-row">
+              {[
+                { icon: "📝", value: totalExams,  label: "মোট পরীক্ষা", color: "#2563eb" },
+                { icon: "⭐", value: totalMarks,   label: "মোট নম্বর",   color: "#16a34a" },
+                { icon: "📊", value: `${avgPct}%`, label: "গড় স্কোর",   color: "#7c3aed" },
+              ].map(({ icon, value, label, color }) => (
+                <div key={label} className="mcqd-stat-card">
+                  <div className="mcqd-stat-icon">{icon}</div>
+                  <div className="mcqd-stat-value" style={{ color }}>{value}</div>
+                  <div className="mcqd-stat-label">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Performance */}
+            <div className="mcqd-perf-card">
+              <h3 className="mcqd-section-title">🎯 কুইজ পারফরম্যান্স স্তর</h3>
+              <div className="mcqd-grade-row">
+                <div className="mcqd-grade-badge" style={{ background: grade.bg, color: grade.color }}>
+                  {grade.grade}
+                </div>
+                <div>
+                  <p className="mcqd-grade-label" style={{ color: grade.color }}>{grade.label}</p>
+                  <p className="mcqd-grade-desc">{grade.desc}</p>
+                </div>
+              </div>
+              <div className="mcqd-bar-bg mcqd-bar-light">
+                <div className="mcqd-perf-bar-fill" style={{ width: `${perfBarW}%`, background: grade.bar }} />
+              </div>
+              <div className="mcqd-bar-labels">
+                <span>০%</span><span>২৫%</span><span>৫০%</span><span>৭৫%</span><span>১০০%</span>
+              </div>
+            </div>
+
+            {/* Exam History */}
+            <div className="mcqd-history-card">
+              <div className="mcqd-history-header">
+                <h3 className="mcqd-section-title" style={{ margin: 0 }}>📋 পরীক্ষার ইতিহাস</h3>
+                <span className="mcqd-history-count">মোট {DEMO_EXAMS.length}টি পরীক্ষা</span>
+              </div>
+
+              {DEMO_EXAMS.length === 0 ? (
+                <div className="mcqd-empty">
+                  <div className="mcqd-empty-icon">📭</div>
+                  <p>এখনো কোনো পরীক্ষা দেননি</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table className="mcqd-table">
+                    <thead>
+                      <tr>
+                        <th>পরীক্ষার নাম</th>
+                        <th>তারিখ</th>
+                        <th>স্কোর</th>
+                        <th>র‍্যাংক</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {DEMO_EXAMS.map((ex) => {
+                        const pct = Math.round((ex.obtained / ex.total) * 100);
+                        return (
+                          <tr key={ex.id}>
+                            <td className="mcqd-td-name">{ex.name}</td>
+                            <td className="mcqd-td-date">{ex.date}</td>
+                            <td>
+                              <span className={`mcqd-score-chip ${getScoreChip(pct)}`}>
+                                {ex.obtained}/{ex.total} ({pct}%)
+                              </span>
+                            </td>
+                            <td>
+                              <span className="mcqd-rank-chip">🏅 {ex.rank}/{ex.totalStudents}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ── TAB 2: FOCUS STUDY VIEW ── */}
+        {activeDashTab === "study" && (
+          <>
+            {/* Top row: Profile + Study Hours & Grade */}
+            <div className="mcqd-top-row">
+              {/* Profile Card */}
+              <div className="mcqd-profile-card">
                 <div className="mcqd-profile-avatar-wrap">
                   <div className="mcqd-profile-avatar">
                     <Avatar photo={user.photo} name={user.name} />
@@ -257,133 +474,132 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
                 <p className="mcqd-profile-name">{user.name}</p>
                 <p className="mcqd-profile-inst">{user.institute}</p>
                 <div className="mcqd-profile-tags">
-                  <span className="mcqd-tag">📱 {user.mobile}</span>
-                  {user.email && <span className="mcqd-tag">✉ {user.email}</span>}
+                  <span className="mcqd-tag">⏱️ স্টাডি ট্র্যাকার অ্যাক্টিভ</span>
                 </div>
-              </>
-            ) : (
-              <form onSubmit={saveEdit} className="mcqd-edit-form">
-                <div className="mcqd-edit-avatar-picker" onClick={() => editFileRef.current.click()}>
-                  <div className="mcqd-profile-avatar">
-                    <Avatar photo={editData.photo} name={editData.name} />
-                  </div>
-                  <div className="mcqd-edit-avatar-overlay">📷</div>
-                </div>
-                <input ref={editFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEditPhoto} />
-                
-                <input id="name" value={editData.name} onChange={handleEditChange} className="mcqd-input" placeholder="আপনার নাম" required />
-                <input id="mobile" value={editData.mobile} onChange={handleEditChange} className="mcqd-input" placeholder="মোবাইল নম্বর" type="tel" maxLength={11} required />
-                <input id="institute" value={editData.institute} onChange={handleEditChange} className="mcqd-input" placeholder="প্রতিষ্ঠানের নাম" required />
-                <input id="email" value={editData.email} onChange={handleEditChange} className="mcqd-input" placeholder="ইমেইল (ঐচ্ছিক)" type="email" />
-                
-                <div className="mcqd-edit-actions">
-                  <button type="submit" className="mcqd-btn-save">সেভ করুন</button>
-                  <button type="button" onClick={cancelEdit} className="mcqd-btn-cancel">বাতিল</button>
-                </div>
-              </form>
-            )}
-            
-          </div>
-
-          {/* Rank */}
-          <div className="mcqd-rank-card">
-            <p className="mcqd-rank-card-title">🏆 সামগ্রিক র‍্যাংক</p>
-            <div className="mcqd-rank-num-row">
-              <span className="mcqd-rank-num">{OVERALL_RANK}</span>
-              <span className="mcqd-rank-suffix">তম</span>
-            </div>
-            <p className="mcqd-rank-total">মোট {TOTAL_STUDENTS} জন শিক্ষার্থীর মধ্যে</p>
-            <div className="mcqd-rank-perc-box">
-              <p className="mcqd-rank-perc-label">শীর্ষ শতাংশ</p>
-              <div className="mcqd-bar-bg">
-                <div className="mcqd-rank-bar-fill" style={{ width: `${rankBarW}%` }} />
               </div>
-              <p className="mcqd-rank-perc-val">শীর্ষ {100 - rankPct}% শিক্ষার্থীর মধ্যে আছেন</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div className="mcqd-stats-row">
-          {[
-            { icon: "📝", value: totalExams,  label: "মোট পরীক্ষা", color: "#2563eb" },
-            { icon: "⭐", value: totalMarks,   label: "মোট নম্বর",   color: "#16a34a" },
-            { icon: "📊", value: `${avgPct}%`, label: "গড় স্কোর",   color: "#7c3aed" },
-          ].map(({ icon, value, label, color }) => (
-            <div key={label} className="mcqd-stat-card">
-              <div className="mcqd-stat-icon">{icon}</div>
-              <div className="mcqd-stat-value" style={{ color }}>{value}</div>
-              <div className="mcqd-stat-label">{label}</div>
+              {/* Study Hours & Grade Summary Card */}
+              <div className="mcqd-rank-card" style={{ background: "linear-gradient(135deg, #064e3b, #047857)", color: "#fff" }}>
+                <p className="mcqd-rank-card-title" style={{ color: "#a7f3d0" }}>⏱️ মোট পড়ার সময় ও গ্রেড</p>
+                <div className="mcqd-rank-num-row">
+                  <span className="mcqd-rank-num" style={{ color: "#fff" }}>{totalStudyHours}</span>
+                  <span className="mcqd-rank-suffix" style={{ color: "#a7f3d0" }}>ঘণ্টা</span>
+                </div>
+                <p className="mcqd-rank-total" style={{ color: "#d1fae5" }}>
+                  অর্জিত স্টাডি গ্রেড: <strong style={{ color: "#fef08a" }}>{studyGrade.grade}</strong> ({studyGrade.label})
+                </p>
+                <div className="mcqd-rank-perc-box" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}>
+                  <p className="mcqd-rank-perc-label" style={{ color: "#a7f3d0" }}>মোট স্টাডি পয়েন্ট</p>
+                  <p className="mcqd-rank-perc-val" style={{ color: "#fff", fontWeight: 800 }}>{studyPoints} pts অর্জিত</p>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Performance */}
-        <div className="mcqd-perf-card">
-          <h3 className="mcqd-section-title">🎯 পারফরম্যান্স স্তর</h3>
-          <div className="mcqd-grade-row">
-            <div className="mcqd-grade-badge" style={{ background: grade.bg, color: grade.color }}>
-              {grade.grade}
+            {/* Study Stats Row */}
+            <div className="mcqd-stats-row">
+              {[
+                { icon: "⏳", value: `${totalStudyHours} ঘণ্টা`, label: "মোট পড়ার সময়", color: "#10b981" },
+                { icon: "🎯", value: studyGrade.grade, label: `গ্রেড: ${studyGrade.label}`, color: "#06b6d4" },
+                { icon: "🔥", value: `${studySessions.length} টি`, label: "মোট সেশন সম্পন্ন", color: "#f59e0b" },
+                { icon: "⭐", value: `${studyPoints} pts`, label: "অর্জিত স্টাডি পয়েন্ট", color: "#8b5cf6" },
+              ].map(({ icon, value, label, color }) => (
+                <div key={label} className="mcqd-stat-card">
+                  <div className="mcqd-stat-icon">{icon}</div>
+                  <div className="mcqd-stat-value" style={{ color }}>{value}</div>
+                  <div className="mcqd-stat-label">{label}</div>
+                </div>
+              ))}
             </div>
-            <div>
-              <p className="mcqd-grade-label" style={{ color: grade.color }}>{grade.label}</p>
-              <p className="mcqd-grade-desc">{grade.desc}</p>
-            </div>
-          </div>
-          <div className="mcqd-bar-bg mcqd-bar-light">
-            <div className="mcqd-perf-bar-fill" style={{ width: `${perfBarW}%`, background: grade.bar }} />
-          </div>
-          <div className="mcqd-bar-labels">
-            <span>০%</span><span>২৫%</span><span>৫০%</span><span>৭৫%</span><span>১০০%</span>
-          </div>
-        </div>
 
-        {/* Exam History */}
-        <div className="mcqd-history-card">
-          <div className="mcqd-history-header">
-            <h3 className="mcqd-section-title" style={{ margin: 0 }}>📋 পরীক্ষার ইতিহাস</h3>
-            <span className="mcqd-history-count">মোট {DEMO_EXAMS.length}টি পরীক্ষা</span>
-          </div>
-
-          {DEMO_EXAMS.length === 0 ? (
-            <div className="mcqd-empty">
-              <div className="mcqd-empty-icon">📭</div>
-              <p>এখনো কোনো পরীক্ষা দেননি</p>
+            {/* Study Grade Performance Card */}
+            <div className="mcqd-perf-card">
+              <h3 className="mcqd-section-title">🎯 স্টাডি ধারাবাহিকতা ও পারফরম্যান্স স্তর</h3>
+              <div className="mcqd-grade-row">
+                <div className="mcqd-grade-badge" style={{ background: studyGrade.bg, color: studyGrade.color }}>
+                  {studyGrade.grade}
+                </div>
+                <div>
+                  <p className="mcqd-grade-label" style={{ color: studyGrade.color }}>{studyGrade.label}</p>
+                  <p className="mcqd-grade-desc">{studyGrade.desc}</p>
+                </div>
+              </div>
+              <div className="mcqd-bar-bg mcqd-bar-light">
+                <div className="mcqd-perf-bar-fill" style={{ width: `${studyGrade.pct}%`, background: studyGrade.bar }} />
+              </div>
+              <div className="mcqd-bar-labels">
+                <span>০ ঘণ্টা</span><span>১০ ঘণ্টা</span><span>২০ ঘণ্টা</span><span>৩০ ঘণ্টা</span><span>৫০+ ঘণ্টা (A+)</span>
+              </div>
             </div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table className="mcqd-table">
-                <thead>
-                  <tr>
-                    <th>পরীক্ষার নাম</th>
-                    <th>তারিখ</th>
-                    <th>স্কোর</th>
-                    <th>র‍্যাংক</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {DEMO_EXAMS.map((ex) => {
-                    const pct = Math.round((ex.obtained / ex.total) * 100);
-                    return (
-                      <tr key={ex.id}>
-                        <td className="mcqd-td-name">{ex.name}</td>
-                        <td className="mcqd-td-date">{ex.date}</td>
-                        <td>
-                          <span className={`mcqd-score-chip ${getScoreChip(pct)}`}>
-                            {ex.obtained}/{ex.total} ({pct}%)
-                          </span>
-                        </td>
-                        <td>
-                          <span className="mcqd-rank-chip">🏅 {ex.rank}/{ex.totalStudents}</span>
-                        </td>
+
+            {/* Subject Breakdown Card */}
+            <div className="mcqd-perf-card">
+              <h3 className="mcqd-section-title">📚 বিষয়ভিত্তিক পড়ার বণ্টন</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+                {studySubBreakdown.map((sub) => (
+                  <div key={sub.id}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>
+                      <span>{sub.icon} {sub.name}</span>
+                      <span style={{ color: "#059669" }}>{sub.hours} ঘণ্টা ({sub.pct}%)</span>
+                    </div>
+                    <div className="mcqd-bar-bg mcqd-bar-light" style={{ height: "8px", margin: 0 }}>
+                      <div style={{ width: `${sub.pct}%`, height: "100%", background: sub.color, borderRadius: "999px" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Study Session History Table */}
+            <div className="mcqd-history-card">
+              <div className="mcqd-history-header">
+                <h3 className="mcqd-section-title" style={{ margin: 0 }}>📋 পড়ার সাম্প্রতিক সেশন লগ</h3>
+                <span className="mcqd-history-count">মোট {studySessions.length}টি সেশন</span>
+              </div>
+
+              {studySessions.length === 0 ? (
+                <div className="mcqd-empty">
+                  <div className="mcqd-empty-icon">⏱️</div>
+                  <p style={{ fontWeight: 600, color: "#1f2937", marginBottom: "6px" }}>এখনো কোনো পড়ার সেশন রেকর্ড হয়নি</p>
+                  <p style={{ fontSize: "13px", color: "#6b7280" }}>ফোকাস স্টাডি টাইমার চালিয়ে পড়া শুরু করো, তোমার পড়া নিখুঁতভাবে রেকর্ড হবে!</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table className="mcqd-table">
+                    <thead>
+                      <tr>
+                        <th>তারিখ</th>
+                        <th>বিষয়</th>
+                        <th>পড়ার সময়</th>
+                        <th>পয়েন্ট</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {studySessions.slice(0, 10).map((s) => {
+                        const sub = STUDY_SUBJECTS.find((sb) => sb.id === s.subjectId) || { name: "বিষয়", icon: "📖" };
+                        return (
+                          <tr key={s.id}>
+                            <td className="mcqd-td-date">{new Date(s.timestamp).toLocaleDateString("bn-BD")}</td>
+                            <td className="mcqd-td-name">{sub.icon} {sub.name}</td>
+                            <td><strong>{s.minutes} মিনিট</strong></td>
+                            <td><span className="mcqd-score-chip chip-green">+{Math.round(s.minutes * 1.5)} pts</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Direct CTA button to Focus Study */}
+            <div style={{ textAlign: "center", margin: "28px 0" }}>
+              <Link to="/focus-study" className="mcqd-btn-start-study">
+                ⏱️ ফোকাস স্টাডি টাইমার ওপেন করো
+              </Link>
+            </div>
+          </>
+        )}
+
 
         {/* Action Buttons Section */}
         <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>

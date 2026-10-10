@@ -672,3 +672,65 @@
 }
 .mcqd-btn-save:hover   { opacity: 0.88; }
 .mcqd-btn-cancel:hover { background: rgba(255,255,255,.18); }
+
+/* ── Dashboard Top Tabs Bar ── */
+.mcqd-tabs-bar {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0 24px;
+  background: rgba(22, 163, 74, 0.08);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  width: fit-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.mcqd-tab-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-family: 'Hind Siliguri', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcqd-tab-btn:hover {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.mcqd-tab-btn.active {
+  background: linear-gradient(135deg, #16a34a, #0d9488);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+
+.mcqd-btn-start-study {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #fff !important;
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.mcqd-btn-start-study:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
