@@ -14,12 +14,23 @@ const INITIAL_SUBJECTS = [
 
 // ── Motivational Quotes ──
 const MOTIVATIONAL_QUOTES = [
-  "প্রতিটি সেকেন্ডের গভীর মনোযোগ তোমার A+ এর পথ সুগম করবে। 🎯",
   "কঠিন পরিশ্রম কখনো বৃথা যায় না; সাফল্য তোমার পদচুম্বন করবেই। 🏆",
+  "প্রতিটি সেকেন্ডের গভীর মনোযোগ তোমার HSC A+ এর পথ সুগম করবে। 🎯",
   "লক্ষ্য স্থির রাখো, মনোযোগ ধরে রাখো, বিজয় সুনিশ্চিত! 🚀",
   "আজকের এক ঘণ্টার ত্যাগ আগামী দিনের সেরা সাফল্যের ভিত্তি। ✨",
-  "স্মার্ট প্রস্তুতিই এনে দেবে কাঙ্ক্ষিত সেরা ফলাফল। 💡",
+  "স্মার্ট প্রস্তুতি ও ধারাবাহিকতাই এনে দেবে কাঙ্ক্ষিত সেরা ফলাফল। 💡",
+  "যে সকালে ঘুম ভাঙে স্বপ্নের তাড়নায়, বিজয় তার অবধারিত। 🌅",
+  "পড়াশোনায় কোনো শর্টকাট নেই, কিন্তু গভীর মনোযোগ সময় বাঁচিয়ে দেয় অর্ধেক। ⏳",
+  "তোমার আজকের প্রতিটি মিনিট তোমার ভবিষ্যতের সেরা বিনিয়োগ। 💎",
+  "বড় অর্জন কখনো এক দিনে হয় না, প্রতিদিনের ছোট ছোট প্রচেষ্টাই ইতিহাস গড়ে। 🌟",
+  "মনোযোগ হারালে চলবে না; তোমার পড়ার টেবিলই তোমার বিজয়ের রণক্ষেত্র! 🛡️",
+  "কষ্ট যত গভীর হবে, সফলতার মিষ্টি অনুভূতি ততটাই তীব্র হবে। 🌈",
+  "যে হাল ছাড়ে না এবং চেষ্টা অব্যাহত রাখে, জয় তার হবেই। ⚡",
+  "মোবাইল ও ডিস্ট্রাকশনকে বিদায় দাও, নিজের স্বপ্নের প্রতি সৎ থাকো। 📱❌",
+  "আজকে একটু বেশি পড়ার সিদ্ধান্ত তোমাকে সবার চেয়ে অনেক এগিয়ে রাখবে। 🏅",
+  "তুমি যা হতে চাও, তার জন্য আজ থেকেই নিজের সেরা শ্রমটুকু দেওয়া শুরু করো! 🔥",
 ];
+
 
 
 
@@ -67,14 +78,22 @@ export default function FocusStudy() {
   const [showAddSub, setShowAddSub] = useState(false);
 
 
-  // Motivational Quote Rotation
-  const [quoteIndex, setQuoteIndex] = useState(0);
+  // Motivational Quote Rotation (Random on every page refresh)
+  const [quoteIndex, setQuoteIndex] = useState(() =>
+    Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)
+  );
+
   useEffect(() => {
     const qInterval = setInterval(() => {
       setQuoteIndex((prev) => (prev + 1) % MOTIVATIONAL_QUOTES.length);
     }, 12000);
     return () => clearInterval(qInterval);
   }, []);
+
+  const handleNextQuote = () => {
+    setQuoteIndex((prev) => (prev + 1) % MOTIVATIONAL_QUOTES.length);
+  };
+
 
   // Timer Tick Hook
   const timerRef = useRef(null);
@@ -386,10 +405,25 @@ export default function FocusStudy() {
               পড়াশোনায় শতভাগ মনোযোগ ধরে রাখো, বিষয়ভিত্তিক পড়ার লাইভ সময় ট্র্যাক করো এবং বন্ধুদের সাথে র‍্যাঙ্কিংয়ে এগিয়ে থাকো!
             </p>
 
-            {/* Motivational Live Quote */}
-            <div className="fs-quote-card">
+            {/* Motivational Live Quote (Random on Refresh + Click to Change) */}
+            <div
+              className="fs-quote-card"
+              onClick={handleNextQuote}
+              title="ক্লিক করে আরেকটি অনুপ্রেরণামূলক বাণী দেখুন"
+            >
               <span className="fs-quote-icon">❝</span>
               <p className="fs-quote-text">{MOTIVATIONAL_QUOTES[quoteIndex]}</p>
+              <button
+                type="button"
+                className="fs-quote-refresh-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNextQuote();
+                }}
+                title="নতুন মোটিভেশন বাণী দেখুন"
+              >
+                🔄
+              </button>
             </div>
 
             {/* Navigation Tabs */}
