@@ -56,6 +56,11 @@ export default function HomeFocusTimer() {
   const [volume, setVolume] = useState(0.6);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // In-app Notification and Confirmation Modal States
+  const [toast, setToast] = useState(null); // { icon, title, message }
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelElapsed, setCancelElapsed] = useState(0);
+
   // Motivational Quote Rotation
   const [quoteIndex, setQuoteIndex] = useState(() =>
     Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)
@@ -64,6 +69,27 @@ export default function HomeFocusTimer() {
   const handleNextQuote = () => {
     setQuoteIndex((prev) => (prev + 1) % MOTIVATIONAL_QUOTES.length);
   };
+
+  // Auto-dismiss in-app toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Accidental Page Leave / Navigation Warning when study session is running
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isRunning) {
+        e.preventDefault();
+        e.returnValue = "আপনার একটি স্টাডি সেশন চলমান রয়েছে। আপনি কি নিশ্চিত যে পেজটি ছাড়তে চান?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isRunning]);
 
   // Sessions from localStorage (Only genuine user sessions)
   const [sessions, setSessions] = useState(() => {
@@ -82,6 +108,13 @@ export default function HomeFocusTimer() {
   // Calculate User Stats cleanly using focusHelpers
   const sessionStats = calculateSessionStats(sessions);
   const { totalHours: userTotalHours, studyPoints: userStudyPoints, currentUserRank } = sessionStats;
+
+  // Countdown Progress Percentage
+  const totalTargetSec = targetMinutes * 60;
+  const countdownProgressPct =
+    timerMode !== "stopwatch" && totalTargetSec > 0
+      ? Math.min(100, Math.max(0, ((totalTargetSec - seconds) / totalTargetSec) * 100))
+      : 0;
 
   // Sync sessions across tabs and pages in real-time
   useEffect(() => {
@@ -209,20 +242,31 @@ export default function HomeFocusTimer() {
     } catch (_) {}
   };
 
-  // Stop & Save Button with accurate elapsed time calculation
+  // Stop & Save Button with accurate elapsed time calculation and in-app feedback
   const handleStopAndSave = () => {
     const elapsedSec = calculateElapsedSeconds(timerMode, seconds, targetMinutes);
     if (elapsedSec < 30) {
-      if (!window.confirm("পড়ার সময় ১ মিনিটের কম (৩০ সেকেন্ডের কম)। আপনি কি সেশনটি বাতিল করতে চান?")) return;
-      setIsRunning(false);
-      setSeconds(timerMode === "stopwatch" ? 0 : targetMinutes * 60);
+      setCancelElapsed(elapsedSec);
+      setShowCancelConfirm(true);
       return;
     }
     const minsRead = elapsedSec / 60;
+    const safeMins = Math.round(minsRead);
     setIsRunning(false);
     setSeconds(timerMode === "stopwatch" ? 0 : targetMinutes * 60);
     handleSessionComplete(minsRead);
-    alert(`🎉 দারুণ! আপনার ${Math.round(minsRead)} মিনিটের পড়ার সেশন সফলভাবে সেভ হয়েছে!`);
+    playAlertChime();
+    setToast({
+      icon: "🎉",
+      title: "দারুণ অর্জন! সেশন সেভ হয়েছে",
+      message: `${safeMins} মিনিটের নিবিড় পড়ার সেশন সফলভাবে যুক্ত হয়েছে (+${Math.round(safeMins * 1.5)} pts)`,
+    });
+  };
+
+  const confirmCancelSession = () => {
+    setIsRunning(false);
+    setSeconds(timerMode === "stopwatch" ? 0 : targetMinutes * 60);
+    setShowCancelConfirm(false);
   };
 
   const handleReset = () => {
@@ -238,6 +282,54 @@ export default function HomeFocusTimer() {
 
   return (
     <div className="hft-container">
+      {/* ── In-App Celebratory Toast Notification ── */}
+      {toast && (
+        <div className="hft-toast-banner" role="alert">
+          <div className="hft-toast-icon">{toast.icon || "🎉"}</div>
+          <div className="hft-toast-info">
+            <h4 className="hft-toast-title">{toast.title}</h4>
+            <p className="hft-toast-msg">{toast.message}</p>
+          </div>
+          <button
+            type="button"
+            className="hft-toast-close"
+            onClick={() => setToast(null)}
+            title="বন্ধ করুন"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── In-App Under 30s Confirmation Modal ── */}
+      {showCancelConfirm && (
+        <div className="hft-modal-overlay">
+          <div className="hft-confirm-dialog">
+            <div className="hft-dialog-icon">⚠️</div>
+            <h3 className="hft-dialog-title">পড়ার সময় ১ মিনিটের কম</h3>
+            <p className="hft-dialog-desc">
+              আপনি মাত্র {cancelElapsed} সেকেন্ড পড়েছেন। আপনি কি এই সেশনটি বাতিল করতে চান, নাকি পড়া অব্যাহত রাখবেন?
+            </p>
+            <div className="hft-dialog-actions">
+              <button
+                type="button"
+                className="hft-dialog-btn-cancel"
+                onClick={confirmCancelSession}
+              >
+                🗑️ সেশন বাতিল করো
+              </button>
+              <button
+                type="button"
+                className="hft-dialog-btn-continue"
+                onClick={() => setShowCancelConfirm(false)}
+              >
+                ▶️ পড়া চালিয়ে যাও
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Zen Fullscreen Overlay ── */}
       {isFullscreen && (
         <div className="hft-zen-fullscreen">
@@ -328,15 +420,38 @@ export default function HomeFocusTimer() {
           </div>
         </div>
 
-        {/* Central Glowing Digital Clock */}
-        <div className={`hft-clock-wrap ${isRunning ? "running" : ""}`}>
-          <div className="hft-time-text">{formatTime(seconds)}</div>
-          <div className="hft-clock-sub">
-            {activeSub.icon} <strong>{activeSub.name}</strong> •{" "}
-            {timerMode === "stopwatch"
-              ? "লাইভ স্টপওয়াচ"
-              : `${targetMinutes} মিনিটের ফোকাস সেশন`}
-          </div>
+        {/* Central Glowing Digital Clock with Circular Progress Arc */}
+        <div className={`hft-clock-wrap ${isRunning ? "running" : ""} ${timerMode !== "stopwatch" ? "countdown" : ""}`}>
+          {timerMode !== "stopwatch" ? (
+            <div className="hft-ring-container">
+              <svg className="hft-ring-svg" viewBox="0 0 180 180">
+                <circle className="hft-ring-bg" cx="90" cy="90" r="78" />
+                <circle
+                  className="hft-ring-progress"
+                  cx="90"
+                  cy="90"
+                  r="78"
+                  style={{
+                    strokeDasharray: 490.09,
+                    strokeDashoffset: 490.09 * (1 - countdownProgressPct / 100),
+                  }}
+                />
+              </svg>
+              <div className="hft-ring-center">
+                <div className="hft-time-text">{formatTime(seconds)}</div>
+                <div className="hft-clock-sub">
+                  {activeSub.icon} <strong>{activeSub.name}</strong> • {Math.round(countdownProgressPct)}% সম্পন্ন
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="hft-time-text">{formatTime(seconds)}</div>
+              <div className="hft-clock-sub">
+                {activeSub.icon} <strong>{activeSub.name}</strong> • লাইভ স্টপওয়াচ
+              </div>
+            </>
+          )}
         </div>
 
         {/* Sound & Fullscreen controls */}
@@ -356,7 +471,14 @@ export default function HomeFocusTimer() {
               onClick={() => handleSelectSound("rain")}
               title="বৃষ্টির শান্ত শব্দ"
             >
-              🌧️ বৃষ্টি
+              <span>🌧️ বৃষ্টি</span>
+              {soundMode === "rain" && (
+                <span className="hft-eq" aria-hidden="true">
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                </span>
+              )}
             </button>
             <button
               type="button"
@@ -364,7 +486,14 @@ export default function HomeFocusTimer() {
               onClick={() => handleSelectSound("binaural")}
               title="১০ Hz আলফা ফোকাস বাইনোরাল টোন"
             >
-              🎧 ফোকাস
+              <span>🎧 ফোকাস</span>
+              {soundMode === "binaural" && (
+                <span className="hft-eq" aria-hidden="true">
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                </span>
+              )}
             </button>
             <button
               type="button"
@@ -372,7 +501,14 @@ export default function HomeFocusTimer() {
               onClick={() => handleSelectSound("waves")}
               title="শান্ত নদীর ঢেউ ও বাতাস"
             >
-              🌊 ঢেউ
+              <span>🌊 ঢেউ</span>
+              {soundMode === "waves" && (
+                <span className="hft-eq" aria-hidden="true">
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                  <span className="hft-eq-bar"></span>
+                </span>
+              )}
             </button>
           </div>
 
@@ -381,22 +517,20 @@ export default function HomeFocusTimer() {
           </button>
         </div>
 
-        {/* Volume Slider when sound is playing */}
-        {soundMode !== "none" && (
-          <div className="hft-volume-bar">
-            <span className="hft-vol-label">🔊 সাউন্ড ভলিউম:</span>
-            <input
-              type="range"
-              min="0.1"
-              max="1"
-              step="0.05"
-              value={volume}
-              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="hft-vol-slider"
-            />
-            <span className="hft-vol-val">{Math.round(volume * 100)}%</span>
-          </div>
-        )}
+        {/* Volume Slider with smooth transition (zero-CLS) */}
+        <div className={`hft-volume-bar ${soundMode !== "none" ? "visible" : ""}`}>
+          <span className="hft-vol-label">🔊 সাউন্ড ভলিউম:</span>
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+            className="hft-vol-slider"
+          />
+          <span className="hft-vol-val">{Math.round(volume * 100)}%</span>
+        </div>
 
         {/* Action Buttons */}
         <div className="hft-actions-row">
@@ -464,42 +598,42 @@ export default function HomeFocusTimer() {
 
         {/* 2x2 Standing Cards (Admin style) */}
         <div className="hft-kpi-grid">
-          <div className="hft-kpi-card" style={{ borderColor: "rgba(245, 158, 11, 0.4)" }}>
+          <div className="hft-kpi-card hft-card-amber">
             <div className="hft-kpi-top">
               <span>🏆</span>
               <span>একাডেমি র‍্যাঙ্ক</span>
             </div>
-            <div className="hft-kpi-val" style={{ color: "#d97706" }}>
+            <div className="hft-kpi-val hft-val-amber">
               #{currentUserRank} তম
             </div>
           </div>
 
-          <div className="hft-kpi-card" style={{ borderColor: "rgba(16, 185, 129, 0.4)" }}>
+          <div className="hft-kpi-card hft-card-green">
             <div className="hft-kpi-top">
               <span>⏳</span>
               <span>মোট পড়ার সময়</span>
             </div>
-            <div className="hft-kpi-val" style={{ color: "#10b981" }}>
+            <div className="hft-kpi-val hft-val-green">
               {userTotalHours} ঘণ্টা
             </div>
           </div>
 
-          <div className="hft-kpi-card" style={{ borderColor: "rgba(6, 182, 212, 0.4)" }}>
+          <div className="hft-kpi-card hft-card-cyan">
             <div className="hft-kpi-top">
               <span>🎯</span>
               <span>অর্জিত পয়েন্ট</span>
             </div>
-            <div className="hft-kpi-val" style={{ color: "#0891b2" }}>
+            <div className="hft-kpi-val hft-val-cyan">
               {userStudyPoints} pts
             </div>
           </div>
 
-          <div className="hft-kpi-card" style={{ borderColor: "rgba(139, 92, 246, 0.4)" }}>
+          <div className="hft-kpi-card hft-card-purple">
             <div className="hft-kpi-top">
               <span>⭐</span>
               <span>বর্তমান লিগ</span>
             </div>
-            <div className="hft-kpi-val" style={{ color: "#7c3aed", fontSize: "15px" }}>
+            <div className="hft-kpi-val hft-val-purple" style={{ fontSize: "15px" }}>
               {getUserBadge(userStudyPoints)}
             </div>
           </div>

@@ -94,6 +94,32 @@ export default function FocusStudy() {
   const [newSubName, setNewSubName] = useState("");
   const [showAddSub, setShowAddSub] = useState(false);
 
+  // In-App Celebratory Toast and Confirmation Dialog States
+  const [toast, setToast] = useState(null); // { icon, title, message }
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelElapsed, setCancelElapsed] = useState(0);
+
+  // Auto-dismiss in-app toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Accidental Page Leave / Navigation Warning when study session is running
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isRunning) {
+        e.preventDefault();
+        e.returnValue = "আপনার একটি স্টাডি সেশন চলমান রয়েছে। আপনি কি নিশ্চিত যে পেজটি ছাড়তে চান?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isRunning]);
+
 
   // Motivational Quote Rotation (Random on every page refresh)
   const [quoteIndex, setQuoteIndex] = useState(() =>
@@ -221,20 +247,31 @@ export default function FocusStudy() {
     } catch (_) {}
   };
 
-  // Manual Stop & Save with accurate elapsed time calculation
+  // Manual Stop & Save with accurate elapsed time calculation and in-app feedback
   const handleStopAndSave = () => {
     const elapsedSec = calculateElapsedSeconds(timerMode, seconds, targetMinutes);
     if (elapsedSec < 30) {
-      if (!window.confirm("পড়ার সময় ১ মিনিটের কম (৩০ সেকেন্ডের কম)। আপনি কি সেশনটি বাতিল করতে চান?")) return;
-      setIsRunning(false);
-      setSeconds(timerMode === "countdown" ? targetMinutes * 60 : 0);
+      setCancelElapsed(elapsedSec);
+      setShowCancelConfirm(true);
       return;
     }
     const minsRead = elapsedSec / 60;
+    const safeMins = Math.round(minsRead);
     setIsRunning(false);
     setSeconds(timerMode === "countdown" ? targetMinutes * 60 : 0);
     handleSessionComplete(minsRead);
-    alert(`🎉 দারুণ! আপনার ${Math.round(minsRead)} মিনিটের পড়ার সেশন সফলভাবে সেভ হয়েছে!`);
+    playAlertChime();
+    setToast({
+      icon: "🎉",
+      title: "দারুণ অর্জন! সেশন সেভ হয়েছে",
+      message: `${safeMins} মিনিটের নিবিড় পড়ার সেশন সফলভাবে যুক্ত হয়েছে (+${Math.round(safeMins * 1.5)} pts)`,
+    });
+  };
+
+  const confirmCancelSession = () => {
+    setIsRunning(false);
+    setSeconds(timerMode === "countdown" ? targetMinutes * 60 : 0);
+    setShowCancelConfirm(false);
   };
 
   // Reset Timer
@@ -356,6 +393,55 @@ export default function FocusStudy() {
 
   return (
     <div className={`focus-study-page ${isFullscreen ? "zen-fullscreen" : ""}`}>
+      {/* ── In-App Celebratory Toast Notification ── */}
+      {toast && (
+        <div className="fs-toast-banner" role="alert">
+          <div className="fs-toast-icon">{toast.icon || "🎉"}</div>
+          <div className="fs-toast-info">
+            <h4 className="fs-toast-title">{toast.title}</h4>
+            <p className="fs-toast-msg">{toast.message}</p>
+          </div>
+          <button
+            type="button"
+            className="fs-toast-close"
+            onClick={() => setToast(null)}
+            title="বন্ধ করুন"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── In-App Under 30s Confirmation Modal ── */}
+      {showCancelConfirm && (
+        <div className="fs-modal-backdrop">
+          <div className="fs-modal-card" style={{ textAlign: "center", maxWidth: "420px" }}>
+            <div style={{ fontSize: "36px", marginBottom: "8px" }}>⚠️</div>
+            <h3 style={{ margin: "0 0 6px 0" }}>পড়ার সময় ১ মিনিটের কম</h3>
+            <p style={{ margin: "0 0 16px 0", color: "var(--muted)", fontSize: "14px" }}>
+              আপনি মাত্র {cancelElapsed} সেকেন্ড পড়েছেন। আপনি কি এই সেশনটি বাতিল করতে চান, নাকি পড়া অব্যাহত রাখবেন?
+            </p>
+            <div className="fs-modal-actions" style={{ justifyContent: "center", gap: "12px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="btn-cancel"
+                style={{ color: "#ef4444", borderColor: "rgba(239, 68, 68, 0.4)", background: "rgba(239, 68, 68, 0.08)" }}
+                onClick={confirmCancelSession}
+              >
+                🗑️ সেশন বাতিল করো
+              </button>
+              <button
+                type="button"
+                className="btn-submit"
+                onClick={() => setShowCancelConfirm(false)}
+              >
+                ▶️ পড়া চালিয়ে যাও
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Zen Fullscreen Header & Exit ── */}
       {isFullscreen && (
         <div className="zen-header wrap">
