@@ -6,6 +6,14 @@ import {
   setAmbientVolume,
   playAlertChime,
 } from "../utils/focusAudio.js";
+import {
+  formatTime,
+  calculateUserRank,
+  getUserBadge,
+  calculateElapsedSeconds,
+  calculateSessionStats,
+  TOTAL_ACADEMY_STUDENTS,
+} from "../utils/focusHelpers.js";
 import "./HomeFocusTimer.css";
 
 // ── Default Subjects ──
@@ -37,8 +45,6 @@ const MOTIVATIONAL_QUOTES = [
   "তুমি যা হতে চাও, তার জন্য আজ থেকেই নিজের সেরা শ্রমটুকু দেওয়া শুরু করো! 🔥",
 ];
 
-const TOTAL_ACADEMY_STUDENTS = 350;
-
 export default function HomeFocusTimer() {
   // Timer States
   const [selectedSubject, setSelectedSubject] = useState(STUDY_SUBJECTS[0].id);
@@ -64,7 +70,8 @@ export default function HomeFocusTimer() {
     try {
       const saved = localStorage.getItem("ict_focus_sessions");
       if (saved) {
-        return JSON.parse(saved).filter((s) => s.id && s.id.startsWith("s_"));
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
       }
       return [];
     } catch (_) {
@@ -72,28 +79,28 @@ export default function HomeFocusTimer() {
     }
   });
 
-  // Calculate User Stats
-  const totalMinutesAll = sessions.reduce((acc, s) => acc + (s.minutes || 0), 0);
-  const userTotalHours = (totalMinutesAll / 60).toFixed(1);
-  const userStudyPoints = Math.round(totalMinutesAll * 1.5);
+  // Calculate User Stats cleanly using focusHelpers
+  const sessionStats = calculateSessionStats(sessions);
+  const { totalHours: userTotalHours, studyPoints: userStudyPoints, currentUserRank } = sessionStats;
 
-  const getUserBadge = (pts) => {
-    if (pts >= 800) return "💎 ডায়মন্ড লিগ";
-    if (pts >= 500) return "🥇 গোল্ড লিগ";
-    if (pts >= 250) return "🥈 সিলভার লিগ";
-    if (pts > 0) return "🥉 ব্রোঞ্জ লিগ";
-    return "🌱 নতুন লার্নার";
-  };
-
-  const calculateUserRank = (pts) => {
-    if (pts >= 1200) return 1;
-    if (pts >= 900) return Math.max(2, Math.round(15 - (pts - 900) / 25));
-    if (pts >= 600) return Math.max(16, Math.round(50 - (pts - 600) / 10));
-    if (pts >= 300) return Math.max(51, Math.round(150 - (pts - 300) / 3));
-    if (pts > 0) return Math.max(151, Math.round(300 - pts));
-    return 320;
-  };
-  const currentUserRank = calculateUserRank(userStudyPoints);
+  // Sync sessions across tabs and pages in real-time
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      try {
+        const saved = localStorage.getItem("ict_focus_sessions");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) setSessions(parsed);
+        }
+      } catch (_) {}
+    };
+    window.addEventListener("focus-sessions-updated", handleStorageUpdate);
+    window.addEventListener("storage", handleStorageUpdate);
+    return () => {
+      window.removeEventListener("focus-sessions-updated", handleStorageUpdate);
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  }, []);
 
   // Timer Tick Hook
   const timerRef = useRef(null);
@@ -185,11 +192,12 @@ export default function HomeFocusTimer() {
 
   // Save Completed Session
   const handleSessionComplete = (minutesRead) => {
-    if (!minutesRead || minutesRead <= 0) return;
+    const safeMins = Math.max(1, Math.round(Number(minutesRead) || 0));
+    if (safeMins <= 0) return;
     const newSession = {
       id: "s_" + Date.now(),
       subjectId: selectedSubject,
-      minutes: Math.max(1, Math.round(minutesRead)),
+      minutes: safeMins,
       date: new Date().toISOString(),
       timestamp: Date.now(),
     };
@@ -197,22 +205,20 @@ export default function HomeFocusTimer() {
     setSessions(updated);
     try {
       localStorage.setItem("ict_focus_sessions", JSON.stringify(updated));
+      window.dispatchEvent(new Event("focus-sessions-updated"));
     } catch (_) {}
   };
 
-  // Stop & Save Button
+  // Stop & Save Button with accurate elapsed time calculation
   const handleStopAndSave = () => {
-    if (seconds <= 30 && timerMode === "stopwatch") {
-      if (!window.confirm("পড়ার সময় ১ মিনিটের কম। আপনি কি সেশনটি বাতিল করতে চান?")) return;
+    const elapsedSec = calculateElapsedSeconds(timerMode, seconds, targetMinutes);
+    if (elapsedSec < 30) {
+      if (!window.confirm("পড়ার সময় ১ মিনিটের কম (৩০ সেকেন্ডের কম)। আপনি কি সেশনটি বাতিল করতে চান?")) return;
       setIsRunning(false);
-      setSeconds(0);
+      setSeconds(timerMode === "stopwatch" ? 0 : targetMinutes * 60);
       return;
     }
-    const minsRead =
-      timerMode !== "stopwatch"
-        ? (targetMinutes * 60 - seconds) / 60
-        : seconds / 60;
-
+    const minsRead = elapsedSec / 60;
     setIsRunning(false);
     setSeconds(timerMode === "stopwatch" ? 0 : targetMinutes * 60);
     handleSessionComplete(minsRead);
@@ -226,14 +232,6 @@ export default function HomeFocusTimer() {
     } else {
       setSeconds(targetMinutes * 60);
     }
-  };
-
-  // Format Time Helper
-  const formatTime = (totalSec) => {
-    const hrs = Math.floor(totalSec / 3600);
-    const mins = Math.floor((totalSec % 3600) / 60);
-    const secs = totalSec % 60;
-    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const activeSub = STUDY_SUBJECTS.find((s) => s.id === selectedSubject) || STUDY_SUBJECTS[0];

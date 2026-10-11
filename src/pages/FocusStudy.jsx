@@ -5,6 +5,16 @@ import {
   setAmbientVolume,
   playAlertChime,
 } from "../utils/focusAudio.js";
+import {
+  formatTime,
+  calculateUserRank,
+  getUserBadge,
+  getNextTier,
+  getStudyGrade,
+  calculateElapsedSeconds,
+  calculateSessionStats,
+  TOTAL_ACADEMY_STUDENTS,
+} from "../utils/focusHelpers.js";
 import "./FocusStudy.css";
 
 // ── Default Subjects ──
@@ -173,13 +183,33 @@ export default function FocusStudy() {
     return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
+  // Sync sessions across tabs and components
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      try {
+        const saved = localStorage.getItem("ict_focus_sessions");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) setSessions(parsed);
+        }
+      } catch (_) {}
+    };
+    window.addEventListener("focus-sessions-updated", handleStorageUpdate);
+    window.addEventListener("storage", handleStorageUpdate);
+    return () => {
+      window.removeEventListener("focus-sessions-updated", handleStorageUpdate);
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  }, []);
+
   // Save Completed Session
   const handleSessionComplete = (minutesRead) => {
-    if (!minutesRead || minutesRead <= 0) return;
+    const safeMins = Math.max(1, Math.round(Number(minutesRead) || 0));
+    if (safeMins <= 0) return;
     const newSession = {
       id: "s_" + Date.now(),
       subjectId: selectedSubject,
-      minutes: Math.max(1, Math.round(minutesRead)),
+      minutes: safeMins,
       date: new Date().toISOString(),
       timestamp: Date.now(),
     };
@@ -187,20 +217,22 @@ export default function FocusStudy() {
     setSessions(updated);
     try {
       localStorage.setItem("ict_focus_sessions", JSON.stringify(updated));
+      window.dispatchEvent(new Event("focus-sessions-updated"));
     } catch (_) {}
   };
 
-  // Manual Stop & Save
+  // Manual Stop & Save with accurate elapsed time calculation
   const handleStopAndSave = () => {
-    if (seconds <= 30) {
-      if (!window.confirm("পড়ার সময় ১ মিনিটের কম। আপনি কি সেশনটি বাতিল করতে চান?")) return;
+    const elapsedSec = calculateElapsedSeconds(timerMode, seconds, targetMinutes);
+    if (elapsedSec < 30) {
+      if (!window.confirm("পড়ার সময় ১ মিনিটের কম (৩০ সেকেন্ডের কম)। আপনি কি সেশনটি বাতিল করতে চান?")) return;
       setIsRunning(false);
-      setSeconds(0);
+      setSeconds(timerMode === "countdown" ? targetMinutes * 60 : 0);
       return;
     }
-    const minsRead = timerMode === "countdown" ? (targetMinutes * 60 - seconds) / 60 : seconds / 60;
+    const minsRead = elapsedSec / 60;
     setIsRunning(false);
-    setSeconds(0);
+    setSeconds(timerMode === "countdown" ? targetMinutes * 60 : 0);
     handleSessionComplete(minsRead);
     alert(`🎉 দারুণ! আপনার ${Math.round(minsRead)} মিনিটের পড়ার সেশন সফলভাবে সেভ হয়েছে!`);
   };
@@ -250,32 +282,33 @@ export default function FocusStudy() {
     } catch (_) {}
   };
 
-  // ── Calculation Helpers ──
+  // ── Calculation Helpers using focusHelpers ──
   const activeSubjectObj = subjects.find((s) => s.id === selectedSubject) || subjects[0];
-
-  // Format Seconds to HH:MM:SS
-  const formatTime = (totalSec) => {
-    const hrs = Math.floor(totalSec / 3600);
-    const mins = Math.floor((totalSec % 3600) / 60);
-    const secs = totalSec % 60;
-    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
 
   // Filter Sessions
   const now = new Date();
   const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const weeklySessions = sessions.filter((s) => new Date(s.timestamp) >= startOfWeek);
-  const monthlySessions = sessions.filter((s) => new Date(s.timestamp) >= startOfMonth);
+  const stats = calculateSessionStats(sessions);
+  const {
+    totalMinutes: totalMinutesAll,
+    totalHours: userTotalHours,
+    studyPoints: userStudyPoints,
+    currentUserRank,
+  } = stats;
 
-  const totalMinutesAll = sessions.reduce((acc, s) => acc + s.minutes, 0);
-  const totalMinutesWeek = weeklySessions.reduce((acc, s) => acc + s.minutes, 0);
-  const totalMinutesMonth = monthlySessions.reduce((acc, s) => acc + s.minutes, 0);
+  const weeklySessions = stats.validSessions.filter((s) => new Date(s.timestamp) >= startOfWeek);
+  const monthlySessions = stats.validSessions.filter((s) => new Date(s.timestamp) >= startOfMonth);
+
+  const totalMinutesWeek = weeklySessions.reduce((acc, s) => acc + (Number(s.minutes) || 0), 0);
+  const totalMinutesMonth = monthlySessions.reduce((acc, s) => acc + (Number(s.minutes) || 0), 0);
 
   // Subject breakdown for current week
   const subjectBreakdown = subjects.map((sub) => {
-    const subMins = sessions.filter((s) => s.subjectId === sub.id).reduce((acc, s) => acc + s.minutes, 0);
+    const subMins = stats.validSessions
+      .filter((s) => s.subjectId === sub.id)
+      .reduce((acc, s) => acc + (Number(s.minutes) || 0), 0);
     return {
       ...sub,
       totalMinutes: subMins,
@@ -284,38 +317,6 @@ export default function FocusStudy() {
     };
   });
 
-  // Calculate User Study Points & League
-  const userStudyPoints = Math.round(totalMinutesAll * 1.5);
-  const userTotalHours = (totalMinutesAll / 60).toFixed(1);
-
-  const getUserBadge = (pts) => {
-    if (pts >= 800) return "💎 ডায়মন্ড লিগ (Top Tier)";
-    if (pts >= 500) return "🥇 গোল্ড লিগ (Advanced)";
-    if (pts >= 250) return "🥈 সিলভার লিগ (Pro)";
-    if (pts > 0) return "🥉 ব্রোঞ্জ লিগ (Active)";
-    return "🌱 নতুন লার্নার (Starter)";
-  };
-
-  // Dynamic Relative Rank (out of 350+ Academy students) based on points
-  const calculateUserRank = (pts) => {
-    if (pts >= 1200) return 1;
-    if (pts >= 900) return Math.max(2, Math.round(15 - (pts - 900) / 25));
-    if (pts >= 600) return Math.max(16, Math.round(50 - (pts - 600) / 10));
-    if (pts >= 300) return Math.max(51, Math.round(150 - (pts - 300) / 3));
-    if (pts > 0) return Math.max(151, Math.round(300 - pts));
-    return 320;
-  };
-  const currentUserRank = calculateUserRank(userStudyPoints);
-  const TOTAL_ACADEMY_STUDENTS = 350;
-
-  // Next League Tier Helper
-  const getNextTier = (pts) => {
-    if (pts < 100) return { nextLeague: "🥉 ব্রোঞ্জ লিগ", needed: 100 - pts, pct: Math.min(100, Math.round((pts / 100) * 100)) };
-    if (pts < 250) return { nextLeague: "🥈 সিলভার লিগ", needed: 250 - pts, pct: Math.min(100, Math.round(((pts - 100) / 150) * 100)) };
-    if (pts < 500) return { nextLeague: "🥇 গোল্ড লিগ", needed: 500 - pts, pct: Math.min(100, Math.round(((pts - 250) / 250) * 100)) };
-    if (pts < 800) return { nextLeague: "💎 ডায়মন্ড লিগ", needed: 800 - pts, pct: Math.min(100, Math.round(((pts - 500) / 300) * 100)) };
-    return { nextLeague: "👑 সর্বোচ্চ ডায়মন্ড লিগ", needed: 0, pct: 100 };
-  };
   const nextTier = getNextTier(userStudyPoints);
 
   // Student Study Records for Admin (Strictly Hours & Grade only — no personal names/details)

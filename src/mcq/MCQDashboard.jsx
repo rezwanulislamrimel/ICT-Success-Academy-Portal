@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { calculateSessionStats, getStudyGrade } from "../utils/focusHelpers";
 import "./MCQDashboard.css";
 
 // ─────────────────────────────────────────────
@@ -25,15 +26,6 @@ const STUDY_SUBJECTS = [
   { id: "math", name: "উচ্চতর গণিত (Higher Math)", icon: "📐", color: "#06b6d4" },
   { id: "biology", name: "জীববিজ্ঞান (Biology)", icon: "🧬", color: "#14b8a6" },
 ];
-
-function getStudyGrade(mins) {
-  const pts = Math.round(mins * 1.5);
-  if (pts >= 600) return { grade: "A+", label: "অসাধারণ নিয়মানুবর্তিতা", desc: "তোমার পড়ার ধারাবাহিকতা শীর্ষ স্তরের!", bg: "#dcfce7", color: "#16a34a", bar: "linear-gradient(90deg, #16a34a, #4ade80)", pct: 100 };
-  if (pts >= 400) return { grade: "A", label: "চমৎকার অগ্রগতি", desc: "তুমি খুব নিয়মিতভাবে পড়াশোনা চালিয়ে যাচ্ছো।", bg: "#d1fae5", color: "#059669", bar: "linear-gradient(90deg, #059669, #6ee7b7)", pct: 80 };
-  if (pts >= 200) return { grade: "B+", label: "ভালো চেষ্টা", desc: "ভালো অগ্রগতি! প্রতিদিন আরেকটু সময় দিলে A+ নিশ্চিত।", bg: "#dbeafe", color: "#2563eb", bar: "linear-gradient(90deg, #2563eb, #93c5fd)", pct: 60 };
-  if (pts > 0) return { grade: "B", label: "সন্তোষজনক শুরু", desc: "পড়া শুরু হয়েছে! প্রতিদিন নির্ধারিত লক্ষ্য পূরণ করো।", bg: "#e0e7ff", color: "#4f46e5", bar: "linear-gradient(90deg, #4f46e5, #a5b4fc)", pct: 40 };
-  return { grade: "🌱 স্টার্টার", label: "এখনো শুরু হয়নি", desc: "টাইমার চালু করে তোমার প্রথম পড়ার সেশনটি শুরু করো!", bg: "#fee2e2", color: "#dc2626", bar: "linear-gradient(90deg, #f87171, #fca5a5)", pct: 10 };
-}
 // ─────────────────────────────────────────────
 
 // ── Helpers ───────────────────────────────────
@@ -189,7 +181,7 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
   const editFileRef = useRef(null);
 
   // Focus Study Data from localStorage
-  const [studySessions] = useState(() => {
+  const loadSessions = () => {
     try {
       const saved = localStorage.getItem("ict_focus_sessions");
       if (saved) {
@@ -199,17 +191,32 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
     } catch (_) {
       return [];
     }
-  });
+  };
 
-  const totalStudyMinutes = studySessions.reduce((acc, s) => acc + (s.minutes || 0), 0);
-  const totalStudyHours = (totalStudyMinutes / 60).toFixed(1);
-  const studyPoints = Math.round(totalStudyMinutes * 1.5);
+  const [studySessions, setStudySessions] = useState(loadSessions);
+
+  useEffect(() => {
+    const handleSync = () => {
+      setStudySessions(loadSessions());
+    };
+    window.addEventListener("focus-sessions-updated", handleSync);
+    window.addEventListener("storage", handleSync);
+    return () => {
+      window.removeEventListener("focus-sessions-updated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
+  }, []);
+
+  const studyStats = calculateSessionStats(studySessions);
+  const totalStudyMinutes = studyStats.totalMinutes;
+  const totalStudyHours = (studyStats.totalMinutes / 60).toFixed(1);
+  const studyPoints = studyStats.totalPoints;
   const studyGrade = getStudyGrade(totalStudyMinutes);
 
   const studySubBreakdown = STUDY_SUBJECTS.map((sub) => {
-    const subMins = studySessions
+    const subMins = studyStats.validSessions
       .filter((s) => s.subjectId === sub.id)
-      .reduce((acc, s) => acc + (s.minutes || 0), 0);
+      .reduce((acc, s) => acc + Number(s.minutes || 0), 0);
     return {
       ...sub,
       hours: (subMins / 60).toFixed(1),
