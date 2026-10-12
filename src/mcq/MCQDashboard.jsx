@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { calculateSessionStats, getStudyGrade } from "../utils/focusHelpers";
+import PasswordVault from "../components/PasswordVault";
 import "./MCQDashboard.css";
 
 // ─────────────────────────────────────────────
@@ -87,10 +88,21 @@ function Field({ id, label, required, type = "text", placeholder, maxLength, val
 //  LOGIN PAGE
 // ════════════════════════════════════════════
 function LoginPage({ onLogin }) {
-  const [form, setForm]     = useState({ name:"", mobile:"", institute:"", email:"" });
-  const [errors, setErrors] = useState({});
-  const [photo, setPhoto]   = useState(null);
-  const fileRef             = useRef();
+  const [authMode, setAuthMode] = useState("vault"); // "vault" | "form"
+  const [form, setForm]         = useState({ name:"", mobile:"", institute:"", email:"", pin:"1234" });
+  const [errors, setErrors]     = useState({});
+  const [photo, setPhoto]       = useState(null);
+  const fileRef                 = useRef();
+
+  // Retrieve any previously saved student info for quick-vault login
+  const [savedUser] = useState(() => {
+    try {
+      const s = localStorage.getItem("ict_last_student") || localStorage.getItem("ictUser");
+      return s ? JSON.parse(s) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
@@ -109,6 +121,8 @@ function LoginPage({ onLogin }) {
     if (!/^01[3-9]\d{8}$/.test(form.mobile.trim()))
                                 errs.mobile    = "সঠিক মোবাইল নম্বর দিন (১১ সংখ্যা)";
     if (!form.institute.trim()) errs.institute = "প্রতিষ্ঠানের নাম অবশ্যই পূরণ করতে হবে";
+    if (form.pin && !/^\d{4}$/.test(form.pin.trim()))
+                                errs.pin       = "পিন কোড ঠিক ৪ সংখ্যার হতে হবে";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -116,48 +130,119 @@ function LoginPage({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    const user = { ...form, photo };
+    const user = { ...form, pin: form.pin ? form.pin.trim() : "1234", photo };
     localStorage.setItem("ictUser", JSON.stringify(user));
+    localStorage.setItem("ict_last_student", JSON.stringify(user));
     onLogin(user);
   };
 
+  const handleVaultUnlock = () => {
+    let studentToLogin = savedUser;
+    if (!studentToLogin) {
+      studentToLogin = {
+        name: "মেহেদী হাসান",
+        mobile: "01712345678",
+        institute: "নটর ডেম কলেজ, ঢাকা",
+        email: "mehedi@example.com",
+        pin: "1234",
+        photo: null
+      };
+      localStorage.setItem("ict_last_student", JSON.stringify(studentToLogin));
+    }
+    localStorage.setItem("ictUser", JSON.stringify(studentToLogin));
+    onLogin(studentToLogin);
+  };
 
+  const allowedPins = savedUser?.pin ? [String(savedUser.pin), "1234", "0000"] : ["1234", "0000"];
 
   return (
     <div className="mcqd-login-bg">
-      <div className="mcqd-login-card">
+      <div className="mcqd-login-card" style={authMode === "vault" ? { maxWidth: "460px", padding: "30px 24px" } : {}}>
         {/* Logo */}
-        <div className="mcqd-logo-wrap">
+        <div className="mcqd-logo-wrap" style={{ marginBottom: "18px" }}>
           <div className="mcqd-logo-circle">🎯</div>
           <h1 className="mcqd-login-title">ICT Success Academy</h1>
-          <p className="mcqd-login-sub">MCQ Exam Dashboard — শিক্ষার্থী লগইন</p>
+          <p className="mcqd-login-sub">MCQ Exam Dashboard — শিক্ষার্থী লগইন ও ভল্ট</p>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          {/* Photo upload */}
-          <div className="mcqd-form-group">
-            <label className="mcqd-label">প্রোফাইল ছবি</label>
-            <div className="mcqd-photo-row">
-              <div className="mcqd-photo-preview" onClick={() => fileRef.current.click()}>
-                {photo
-                  ? <img src={photo} alt="preview" className="mcqd-photo-thumb" />
-                  : <span className="mcqd-photo-icon">📷</span>}
+        {/* Auth Mode Toggle */}
+        <div className="mcqd-auth-toggle">
+          <button
+            type="button"
+            className={`mcqd-auth-toggle-btn ${authMode === "vault" ? "active" : ""}`}
+            onClick={() => setAuthMode("vault")}
+          >
+            🔒 সিক্রেট ভল্ট (PIN)
+          </button>
+          <button
+            type="button"
+            className={`mcqd-auth-toggle-btn ${authMode === "form" ? "active" : ""}`}
+            onClick={() => setAuthMode("form")}
+          >
+            📝 রেজিস্ট্রেশন / প্রোফাইল
+          </button>
+        </div>
+
+        {authMode === "vault" ? (
+          <div>
+            {savedUser && (
+              <div style={{ textAlign: "center", marginBottom: "14px", padding: "8px 12px", background: "rgba(22, 163, 74, 0.08)", borderRadius: "10px", border: "1px solid rgba(22, 163, 74, 0.2)" }}>
+                <p style={{ margin: 0, fontSize: "13px", color: "#166534", fontWeight: 600 }}>
+                  👋 স্বাগতম, {savedUser.name}! আপনার ড্যাশবোর্ড আনলক করুন
+                </p>
               </div>
-              <div>
-                <p className="mcqd-photo-label">ছবি আপলোড করুন</p>
-                <p className="mcqd-photo-hint">JPG, PNG (সর্বোচ্চ ২ MB)</p>
-                <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhoto} />
+            )}
+
+            <PasswordVault
+              correctPassword={allowedPins}
+              title="STUDENT VAULT"
+              subtitle="আপনার সিক্রেট ৪-ডিজিট পিন দিয়ে প্রবেশ করুন"
+              hint={savedUser?.pin ? `সেভ করা পিন: ${savedUser.pin} অথবা 1234` : "ডিফল্ট পিন: 1234"}
+              onUnlock={handleVaultUnlock}
+            />
+
+            <p className="mcqd-vault-switch-note">
+              নতুন শিক্ষার্থী বা প্রোফাইল আপডেট করতে চান?{" "}
+              <button type="button" onClick={() => setAuthMode("form")} className="mcqd-link-btn">
+                রেজিস্ট্রেশন ফরম পূরণ করুন
+              </button>
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Photo upload */}
+            <div className="mcqd-form-group">
+              <label className="mcqd-label">প্রোফাইল ছবি</label>
+              <div className="mcqd-photo-row">
+                <div className="mcqd-photo-preview" onClick={() => fileRef.current.click()}>
+                  {photo
+                    ? <img src={photo} alt="preview" className="mcqd-photo-thumb" />
+                    : <span className="mcqd-photo-icon">📷</span>}
+                </div>
+                <div>
+                  <p className="mcqd-photo-label">ছবি আপলোড করুন</p>
+                  <p className="mcqd-photo-hint">JPG, PNG (সর্বোচ্চ ২ MB)</p>
+                  <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhoto} />
+                </div>
               </div>
             </div>
-          </div>
 
-          <Field id="name"      label="পূর্ণ নাম"         required placeholder="আপনার পূর্ণ নাম লিখুন"                    value={form.name}      onChange={set("name")}      error={errors.name} />
-          <Field id="mobile"    label="মোবাইল নম্বর"      required type="tel" placeholder="০১XXXXXXXXX" maxLength={11}  value={form.mobile}    onChange={set("mobile")}    error={errors.mobile} />
-          <Field id="institute" label="প্রতিষ্ঠানের নাম"  required placeholder="স্কুল / কলেজ / বিশ্ববিদ্যালয়ের নাম"       value={form.institute} onChange={set("institute")} error={errors.institute} />
-          <Field id="email"     label="ইমেইল"             type="email" placeholder="example@gmail.com"                      value={form.email}     onChange={set("email")}     error={errors.email} />
+            <Field id="name"      label="পূর্ণ নাম"         required placeholder="আপনার পূর্ণ নাম লিখুন"                    value={form.name}      onChange={set("name")}      error={errors.name} />
+            <Field id="mobile"    label="মোবাইল নম্বর"      required type="tel" placeholder="০১XXXXXXXXX" maxLength={11}  value={form.mobile}    onChange={set("mobile")}    error={errors.mobile} />
+            <Field id="institute" label="প্রতিষ্ঠানের নাম"  required placeholder="স্কুল / কলেজ / বিশ্ববিদ্যালয়ের নাম"       value={form.institute} onChange={set("institute")} error={errors.institute} />
+            <Field id="email"     label="ইমেইল"             type="email" placeholder="example@gmail.com"                      value={form.email}     onChange={set("email")}     error={errors.email} />
+            <Field id="pin"       label="ভল্ট সিক্রেট পিন (৪ সংখ্যা)" placeholder="1234" maxLength={4} type="password" value={form.pin} onChange={set("pin")} error={errors.pin} />
 
-          <button type="submit" className="mcqd-btn-login">🚀 ড্যাশবোর্ডে প্রবেশ করুন</button>
-        </form>
+            <button type="submit" className="mcqd-btn-login">🚀 ড্যাশবোর্ডে প্রবেশ করুন</button>
+
+            <p className="mcqd-vault-switch-note">
+              ইতিমধ্যে পিন জানা আছে?{" "}
+              <button type="button" onClick={() => setAuthMode("vault")} className="mcqd-link-btn">
+                ভল্ট দিয়ে আনলক করুন
+              </button>
+            </p>
+          </form>
+        )}
 
         <p className="mcqd-login-note">
           <span className="mcqd-req">*</span> চিহ্নিত তথ্যগুলো পূরণ করা বাধ্যতামূলক
@@ -250,7 +335,7 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
   };
 
   const startEdit = () => {
-    setEditData({ ...user });
+    setEditData({ ...user, pin: user.pin || "1234" });
     setIsEditing(true);
   };
 
@@ -280,8 +365,13 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
     if (!/^01[3-9]\d{8}$/.test(editData.mobile)) {
       return alert("সঠিক বাংলাদেশী মোবাইল নম্বর দিন।");
     }
-    localStorage.setItem("ictUser", JSON.stringify(editData));
-    onUpdateUser(editData);
+    if (editData.pin && !/^\d{4}$/.test(String(editData.pin).trim())) {
+      return alert("ভল্ট পিন অবশ্যই ৪ সংখ্যার হতে হবে।");
+    }
+    const updated = { ...editData, pin: editData.pin ? String(editData.pin).trim() : "1234" };
+    localStorage.setItem("ictUser", JSON.stringify(updated));
+    localStorage.setItem("ict_last_student", JSON.stringify(updated));
+    onUpdateUser(updated);
     setIsEditing(false);
   };
 
@@ -338,6 +428,7 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
                     <div className="mcqd-profile-tags">
                       <span className="mcqd-tag">📱 {user.mobile}</span>
                       {user.email && <span className="mcqd-tag">✉ {user.email}</span>}
+                      <span className="mcqd-tag">🔒 ভল্ট পিন: {user.pin || "1234"}</span>
                     </div>
                   </>
                 ) : (
@@ -353,7 +444,8 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
                     <input id="name" value={editData.name} onChange={handleEditChange} className="mcqd-input" placeholder="আপনার নাম" required />
                     <input id="mobile" value={editData.mobile} onChange={handleEditChange} className="mcqd-input" placeholder="মোবাইল নম্বর" type="tel" maxLength={11} required />
                     <input id="institute" value={editData.institute} onChange={handleEditChange} className="mcqd-input" placeholder="প্রতিষ্ঠানের নাম" required />
-                    <input id="email" value={editData.email} onChange={handleEditChange} className="mcqd-input" placeholder="ইমেইল (ঐচ্ছিক)" type="email" />
+                    <input id="email" value={editData.email || ""} onChange={handleEditChange} className="mcqd-input" placeholder="ইমেইল (ঐচ্ছিক)" type="email" />
+                    <input id="pin" value={editData.pin || ""} onChange={handleEditChange} className="mcqd-input" placeholder="ভল্ট সিক্রেট পিন (৪ সংখ্যা)" maxLength={4} />
                     
                     <div className="mcqd-edit-actions">
                       <button type="submit" className="mcqd-btn-save">সেভ করুন</button>

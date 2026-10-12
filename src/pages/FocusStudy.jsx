@@ -15,6 +15,7 @@ import {
   calculateSessionStats,
   TOTAL_ACADEMY_STUDENTS,
 } from "../utils/focusHelpers.js";
+import PasswordVault from "../components/PasswordVault.jsx";
 import "./FocusStudy.css";
 
 // ── Default Subjects ──
@@ -56,6 +57,7 @@ export default function FocusStudy() {
 
   // Active Tab: 'timer' | 'weekly' | 'monthly' | 'leaderboard' | 'admin'
   const [activeTab, setActiveTab] = useState("timer");
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
 
   // Timer States
   const [subjects, setSubjects] = useState(() => {
@@ -1046,15 +1048,45 @@ export default function FocusStudy() {
          ═══════════════════════════════════════════════ */}
       {activeTab === "admin" && !isFullscreen && (
         <div className="wrap fs-report-view">
-          <div className="fs-report-header-card admin-header">
-            <div>
-              <h2>🛡️ অ্যাডমিন স্টাডি অ্যানালিটিক্স প্যানেল</h2>
-              <p>একাডেমির সার্বিক স্টাডি মেট্রিক্স ও সামগ্রিক সম্পৃক্ততা পর্যালোচনা (ব্যক্তিগত ডাটা সম্পূর্ণ সংরক্ষিত):</p>
+          {!isAdminUnlocked ? (
+            <div style={{ textAlign: "center", maxWidth: "560px", margin: "40px auto" }}>
+              <div className="fs-report-header-card admin-header" style={{ display: "block", marginBottom: "20px" }}>
+                <h2>🛡️ সংরক্ষিত অ্যাডমিন অ্যানালিটিক্স ভল্ট</h2>
+                <p style={{ margin: "6px 0 0" }}>
+                  এই সেকশনটি শুধুমাত্র অনুমোদিত অ্যাডমিনের জন্য সংরক্ষিত। প্রবেশ করতে আপনার ৪-ডিজিটের সিক্রেট ভল্ট পিন দিন:
+                </p>
+              </div>
+
+              <PasswordVault
+                correctPassword={["1234", "admin", "admin123"]}
+                title="ADMIN VAULT CODE"
+                subtitle="সিক্রেট পিন দিয়ে অ্যাডমিন ড্যাশবোর্ড আনলক করুন"
+                hint="অ্যাডমিন পিন: 1234"
+                onUnlock={() => setIsAdminUnlocked(true)}
+              />
             </div>
-            <div className="admin-status-pill">
-              <span>Admin Access: Active 🟢</span>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="fs-report-header-card admin-header">
+                <div>
+                  <h2>🛡️ অ্যাডমিন স্টাডি অ্যানালিটিক্স প্যানেল</h2>
+                  <p>একাডেমির সার্বিক স্টাডি মেট্রিক্স ও সামগ্রিক সম্পৃক্ততা পর্যালোচনা (ব্যক্তিগত ডাটা সম্পূর্ণ সংরক্ষিত):</p>
+                </div>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                  <div className="admin-status-pill">
+                    <span>Admin Access: Active 🟢</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-cancel"
+                    onClick={() => setIsAdminUnlocked(false)}
+                    style={{ fontSize: "12.5px", padding: "6px 14px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                    title="ভল্ট পুনরায় লক করুন"
+                  >
+                    🔒 ভল্ট লক করুন
+                  </button>
+                </div>
+              </div>
 
           {/* Admin Stats Overview */}
           <div className="fs-kpi-grid">
@@ -1217,6 +1249,8 @@ export default function FocusStudy() {
               </p>
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
 

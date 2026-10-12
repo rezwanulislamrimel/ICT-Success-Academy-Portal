@@ -66,6 +66,68 @@
   margin: 4px 0 0;
 }
 
+/* Auth Mode Switcher in Login Card */
+.mcqd-auth-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 22px;
+  border: 1px solid #e2e8f0;
+}
+
+.mcqd-auth-toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mcqd-auth-toggle-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.mcqd-auth-toggle-btn:hover:not(.active) {
+  color: #1e293b;
+}
+
+.mcqd-vault-switch-note {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.mcqd-link-btn {
+  background: none;
+  border: none;
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 4px;
+  font-family: inherit;
+}
+
+.mcqd-link-btn:hover {
+  color: #15803d;
+}
+
 /* Form fields */
 .mcqd-form-group { margin-bottom: 16px; }
 
