@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { calculateSessionStats, getStudyGrade } from "../utils/focusHelpers";
 import PasswordVault from "../components/PasswordVault";
+import CreativeLogin from "../components/CreativeLogin";
 import "./MCQDashboard.css";
 
 // ─────────────────────────────────────────────
@@ -326,6 +327,21 @@ function Dashboard({ user, onLogout, onUpdateUser }) {
     const t2 = setTimeout(() => setPerfBarW(avgPct),  500);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [rankPct, avgPct]);
+
+  useEffect(() => {
+    if (user?.name) {
+      window.dispatchEvent(
+        new CustomEvent("mascot-message", {
+          detail: {
+            message: `সাবাশ ${user.name}! নিয়মিত অনুশীলনে তোমার স্কোর শীর্ষে থাকবে 🏆`,
+            mood: "happy",
+            link: "/focus-study",
+            linkText: "⏱️ স্টাডি টাইমার",
+          },
+        })
+      );
+    }
+  }, [user?.name]);
 
   const handleLogout = () => {
     if (window.confirm("আপনি কি লগআউট করতে চান?")) {
@@ -737,6 +753,6 @@ export default function MCQDashboard() {
     catch { return null; }
   });
 
-  if (!user) return <LoginPage onLogin={setUser} />;
+  if (!user) return <CreativeLogin onLogin={setUser} />;
   return <Dashboard user={user} onLogout={() => setUser(null)} onUpdateUser={setUser} />;
 }

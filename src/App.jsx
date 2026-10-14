@@ -53,6 +53,7 @@ import BoardQuestions from './pages/BoardQuestions.jsx';
 import AIAssistant from './pages/AIAssistant.jsx';
 import FocusStudy from './pages/FocusStudy.jsx';
 import MCQDashboard from './mcq/MCQDashboard.jsx';
+import PageMascot from './components/PageMascot.jsx';
 
 // ── Stable layout — defined outside App so it never remounts ──
 function Layout() {
@@ -65,6 +66,7 @@ function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <PageMascot />
     </>
   );
 }
